@@ -3,325 +3,462 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-<title>FEN Commander - Nivelación</title>
+<title>FEN Master Tracker - Nivelación</title>
 <style>
     :root {
-        --bg: #090c10; --surface: #161b22; --surface-hover: #1f242c;
+        --bg: #0d1117; --surface: #161b22; --surface-highlight: #21262d;
         --border: #30363d; --text: #c9d1d9; --text-muted: #8b949e;
-        --accent: #58a6ff; 
-        --status-behind: #f85149; /* Rojo suave */
-        --status-ontrack: #2ea043; /* Verde Github */
-        --status-ahead: #db61a2; /* Rosa Energético/Gold */
+        --accent: #58a6ff; --success: #238636; --warning: #d29922; --danger: #f85149;
         
+        /* Estados de Ánimo (Portada) */
+        --status-behind: #f85149; 
+        --status-ontrack: #2ea043; 
+        --status-ahead: #db61a2; 
+
+        /* Colores por Área */
+        --c-math: #7ee787;   /* Verde Matrix */
+        --c-micro: #f0883e;  /* Naranja Utility */
+        --c-macro: #d2a8ff;  /* Morado Growth */
+        --c-metrics: #79c0ff;/* Azul OLS */
+
         --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-        --font-mono: ui-monospace, SFMono-Regular, monospace;
+        --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-main); margin: 0; padding-bottom: 60px; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-main); margin: 0; padding-bottom: 80px; }
     
-    /* --- PORTADA / HERO SECTION --- */
+    /* --- 1. PORTADA INTELIGENTE (HERO SCREEN) --- */
     .hero-screen {
-        min-height: 100vh; display: flex; flex-direction: column; 
-        align-items: center; justify-content: center; padding: 20px;
-        background: radial-gradient(circle at top, #1f242c 0%, #090c10 100%);
-        transition: transform 0.5s ease, opacity 0.5s ease;
-        position: fixed; inset: 0; z-index: 999;
+        position: fixed; inset: 0; z-index: 2000;
+        background: radial-gradient(circle at top, #1f242c 0%, #0d1117 100%);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 20px; text-align: center;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
     }
     .hero-screen.hidden { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 
-    .hero-status-icon { font-size: 4rem; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+    .hero-icon { font-size: 4.5rem; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
     @keyframes float { 0% {transform: translateY(0px);} 50% {transform: translateY(-10px);} 100% {transform: translateY(0px);} }
 
-    .hero-title { font-size: 2rem; font-weight: 800; color: #fff; text-align: center; margin: 0; }
+    .hero-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -1px; }
     .hero-subtitle { font-size: 1rem; color: var(--text-muted); margin-top: 5px; font-family: var(--font-mono); }
-    
+
     .message-box {
-        margin-top: 30px; padding: 20px; border-radius: 12px;
-        background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-        max-width: 400px; text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        margin-top: 30px; padding: 25px; border-radius: 16px;
+        background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+        max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
-    .msg-title { font-weight: 800; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 8px; }
-    .msg-body { font-size: 1.1rem; line-height: 1.5; font-style: italic; }
+    .msg-header { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 10px; }
+    .msg-body { font-size: 1.1rem; line-height: 1.6; font-style: italic; color: #fff; }
 
     .enter-btn {
-        margin-top: 40px; padding: 15px 40px; border-radius: 30px;
-        background: var(--accent); color: #000; font-weight: 800; border: none;
-        font-size: 1.1rem; cursor: pointer; transition: transform 0.2s;
-        box-shadow: 0 0 20px rgba(88, 166, 255, 0.4);
+        margin-top: 40px; padding: 16px 48px; border-radius: 99px;
+        background: var(--accent); color: #090c10; font-weight: 800; border: none;
+        font-size: 1.1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 0 25px rgba(88, 166, 255, 0.3);
     }
+    .enter-btn:hover { transform: scale(1.05); }
     .enter-btn:active { transform: scale(0.95); }
 
-    /* --- MAIN APP LAYOUT --- */
-    .app-container { opacity: 0; transition: opacity 0.5s ease 0.5s; max-width: 800px; margin: 0 auto; padding: 15px; }
-    .app-container.visible { opacity: 1; }
-
-    /* Sticky Header inside App */
-    .mini-header {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 15px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+    /* --- 2. HEADER APP INTERNA --- */
+    .sticky-header {
+        position: sticky; top: 0; z-index: 100;
+        background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border); padding: 12px 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .mini-stat { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); }
-    .mini-stat span { color: #fff; font-weight: bold; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .app-title { font-weight: 700; font-size: 1.1rem; color: #fff; margin: 0; }
+    .app-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+    
+    .prog-container { height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; position: relative; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); width: 0%; transition: width 0.4s ease; }
+    
+    /* --- 3. LAYOUT & GRID --- */
+    .container { max-width: 1000px; margin: 0 auto; padding: 16px; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+    .container.visible { opacity: 1; }
 
-    /* Week Card Styles */
-    .week-card {
-        background: var(--surface); border: 1px solid var(--border); 
-        border-radius: 10px; margin-bottom: 15px; overflow: hidden;
-    }
+    .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
+    .stat-val { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .stat-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* --- 4. WEEK ACCORDION --- */
+    .week-group { margin-bottom: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow: hidden; transition: border-color 0.2s; }
+    .week-group.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    
     .week-header {
-        padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-        background: var(--surface); border-bottom: 1px solid transparent;
+        padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        background: var(--surface); border-bottom: 1px solid transparent; user-select: none;
     }
-    .week-card[open] .week-header { background: var(--surface-hover); border-bottom-color: var(--border); }
-    
-    .wk-info { display: flex; flex-direction: column; }
-    .wk-title { font-weight: 700; color: #fff; font-size: 1rem; }
-    .wk-date { font-size: 0.75rem; color: var(--accent); font-family: var(--font-mono); margin-top: 4px; display: inline-block; background: rgba(88, 166, 255, 0.1); padding: 2px 6px; border-radius: 4px; }
-    .wk-late { color: var(--status-behind); background: rgba(248, 81, 73, 0.1); } /* Rojo si la fecha ya pasó */
+    .week-group[open] .week-header { border-bottom-color: var(--border); background: var(--surface-highlight); }
+    .wk-title { font-weight: 700; font-size: 1rem; color: #fff; }
+    .wk-dates { font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); }
+    .wk-progress { font-size: 0.75rem; font-weight: 600; color: var(--accent); }
 
-    .topic-item { padding: 15px; border-bottom: 1px solid var(--border); }
-    .topic-item:last-child { border-bottom: none; }
+    /* --- 5. TOPIC CARDS --- */
+    .topic-list { display: grid; grid-template-columns: 1fr; }
+    @media (min-width: 768px) { .topic-list { grid-template-columns: 1fr 1fr; } }
     
-    /* Checkbox & Text */
-    .task-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
-    .task-content { flex: 1; }
-    .task-title { font-size: 0.95rem; color: #fff; margin-bottom: 2px; display: block; }
-    .task-meta { font-size: 0.8rem; color: var(--text-muted); display: block; }
+    .topic-card { padding: 16px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
+    .topic-card:last-child { border-bottom: none; }
+    
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .b-math { background: rgba(126, 231, 135, 0.15); color: var(--c-math); border: 1px solid rgba(126, 231, 135, 0.3); }
+    .b-micro { background: rgba(240, 136, 62, 0.15); color: var(--c-micro); border: 1px solid rgba(240, 136, 62, 0.3); }
+    .b-macro { background: rgba(210, 168, 255, 0.15); color: var(--c-macro); border: 1px solid rgba(210, 168, 255, 0.3); }
+    .b-metrics { background: rgba(121, 192, 255, 0.15); color: var(--c-metrics); border: 1px solid rgba(121, 192, 255, 0.3); }
 
+    .topic-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; color: #fff; }
+    .topic-book { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; display: block; font-family: var(--font-mono); }
+    
+    /* Tasks & Links */
+    .task-list { list-style: none; padding: 0; margin: 0; }
+    .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 0.9rem; color: var(--text); }
+    
     input[type="checkbox"] {
-        appearance: none; width: 22px; height: 22px; 
-        border: 2px solid var(--border); border-radius: 6px; background: #0d1117;
-        margin-top: 2px; cursor: pointer; flex-shrink: 0;
+        appearance: none; -webkit-appearance: none;
+        width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 5px; flex-shrink: 0;
+        background: #0d1117; cursor: pointer; position: relative; margin-top: 2px;
     }
-    input[type="checkbox"]:checked { background: var(--status-ontrack); border-color: var(--status-ontrack); position: relative; }
-    input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; left: 5px; top: 0px; font-weight: bold; }
-
-    /* Video Button */
-    .yt-btn {
-        display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; margin-left: 34px;
-        padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; 
-        background: #21262d; color: var(--text); text-decoration: none; border: 1px solid var(--border);
+    input[type="checkbox"]:checked { background: var(--success); border-color: var(--success); }
+    input[type="checkbox"]:checked::after {
+        content: '✔'; position: absolute; color: #fff; font-size: 12px; top: 0px; left: 4px; font-weight: bold;
     }
-    .yt-btn:hover { border-color: #f00; color: #fff; }
 
-    /* Setup Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; }
-    .modal { background: var(--surface); padding: 25px; border-radius: 12px; border: 1px solid var(--border); width: 90%; max-width: 350px; text-align: center; }
+    .video-btn {
+        display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+        background: #21262d; border: 1px solid var(--border); padding: 6px 12px;
+        border-radius: 20px; font-size: 0.75rem; color: var(--accent); text-decoration: none;
+        transition: all 0.2s;
+    }
+    .video-btn:hover { background: #30363d; border-color: var(--text-muted); transform: translateY(-1px); }
+    .video-icon { fill: currentColor; width: 14px; height: 14px; }
+
+    /* Controls */
+    .controls-area {
+        margin-top: 20px; padding: 16px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
+        display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    }
+    .btn { background: var(--surface-highlight); color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+    .btn-danger { color: var(--danger); border-color: rgba(248, 81, 73, 0.4); }
     
-    /* Bottom Controls */
-    .controls { margin-top: 30px; text-align: center; display: flex; gap: 10px; justify-content: center; }
-    .btn-small { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer; }
+    /* Setup Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .modal { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
+    input[type="date"] { background: #0d1117; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; width: 100%; margin-top: 5px; font-size: 1rem; }
 
 </style>
 </head>
 <body>
 
 <div class="hero-screen" id="hero">
-    <div class="hero-status-icon" id="heroIcon">🚀</div>
-    <h1 class="hero-title">FEN COMMANDER</h1>
-    <div class="hero-subtitle">Nivelación Magíster Análisis Económico</div>
+    <div class="hero-icon" id="heroIcon">🚀</div>
+    <h1 class="hero-title">FEN TRACKER</h1>
+    <div class="hero-subtitle">Magíster Análisis Económico</div>
     
-    <div class="message-box" id="msgBox">
-        <div class="msg-title" id="msgTitle">ESTADO</div>
-        <div class="msg-body" id="msgBody">Calculando trayectoria...</div>
+    <div class="message-box" id="heroMsgBox">
+        <div class="msg-header" id="heroStatusTitle">ANALIZANDO...</div>
+        <div class="msg-body" id="heroStatusBody">Calculando tu trayectoria óptima...</div>
     </div>
 
     <button class="enter-btn" onclick="enterApp()">ENTRAR A ESTUDIAR</button>
-    <div style="margin-top: 20px; font-size: 0.8rem; color: #555;">v3.0 • Responsive • FEN</div>
+</div>
+
+<div class="sticky-header">
+    <div class="header-top">
+        <div>
+            <h1 class="app-title">Planner Nivelación</h1>
+            <span class="app-subtitle" id="currentDateDisplay">Cargando...</span>
+        </div>
+        <div style="text-align:right">
+            <div style="font-weight:700; color:#fff;" id="headerPercent">0%</div>
+        </div>
+    </div>
+    <div class="prog-container">
+        <div class="prog-fill" id="headerFill"></div>
+    </div>
+</div>
+
+<div class="container" id="mainContainer">
+
+    <div class="dashboard">
+        <div class="stat-card">
+            <div class="stat-val" id="kpiDone">0</div>
+            <div class="stat-lbl">Checks Listos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" id="kpiLeft">0</div>
+            <div class="stat-lbl">Pendientes</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" onclick="openSetup()">
+            <div class="stat-val">⚙️</div>
+            <div class="stat-lbl">Ajustar Fecha</div>
+        </div>
+    </div>
+
+    <div id="plannerArea"></div>
+
+    <div class="controls-area">
+        <button class="btn" onclick="exportData()">💾 Guardar</button>
+        <button class="btn" onclick="importData()">📂 Cargar</button>
+        <button class="btn btn-danger" onclick="resetData()">Reset</button>
+    </div>
+    <div style="text-align:center; margin-top:20px; color:#484f58; font-size:0.8rem;">
+        Optimizado para iPad/iPhone · FEN UChile
+    </div>
 </div>
 
 <div class="modal-overlay" id="setupModal">
     <div class="modal">
-        <h3 style="color:#fff; margin-top:0;">Configuración Inicial</h3>
-        <p style="color:var(--text-muted); font-size:0.9rem;">¿Qué día comienza oficialmente tu estudio?</p>
-        <input type="date" id="startDateInput" style="background:#0d1117; color:#fff; border:1px solid var(--border); padding:10px; border-radius:6px; width:100%; font-size:1rem; margin-bottom:20px;">
-        <button class="enter-btn" style="width:100%; padding:10px; margin-top:0;" onclick="saveSetup()">Guardar Fecha</button>
-    </div>
-</div>
-
-<div class="app-container" id="app">
-    
-    <div class="mini-header">
-        <div class="mini-stat">INICIO: <span id="displayStartDate">-</span></div>
-        <div class="mini-stat">PROGRESO: <span id="displayPercent">0%</span></div>
-    </div>
-
-    <div id="plannerList"></div>
-
-    <div class="controls">
-        <button class="btn-small" onclick="exportData()">Guardar Datos</button>
-        <button class="btn-small" onclick="importData()">Cargar Datos</button>
-        <button class="btn-small" style="color:var(--status-behind)" onclick="resetData()">Reset</button>
+        <h3 style="margin-top:0; color:#fff;">Configuración Inicial</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem;">Elige la fecha de inicio de tu nivelación para calibrar el sistema.</p>
+        <input type="date" id="startDateInput">
+        <button class="btn" style="width:100%; margin-top:20px; background:var(--accent); color:#000; border:none; font-weight:bold;" onclick="saveSetup()">Guardar y Empezar</button>
     </div>
 </div>
 
 <script>
-/* ================== DATA: BIBLIOGRAFÍA FEN + VIDEOS ================== */
+/* ======================== 1. DATOS MAESTROS ======================== */
 const PLAN = [
     {
-        w: 1, title: "Fundamentos",
+        w: 1, title: "Fundamentos & Álgebra Matricial",
         topics: [
-            { area: "Math", title: "Álgebra Lineal: Bases", desc: "Simon & Blume Cap. 6-7: Vectores, Independencia.", vid: "https://youtu.be/ZK3O402wf1c", vidLabel: "MIT: Matrix Algebra" },
-            { area: "Micro", title: "Consumidor: Preferencias", desc: "Nicholson Cap. 3: Axiomas y Utilidad.", vid: "https://youtu.be/1Y2r36wS01c", vidLabel: "Micro: Preferences" },
-            { area: "Metrics", title: "Repaso Estadístico", desc: "Wooldridge Apéndice B: Esperanza y Varianza.", vid: "https://youtu.be/Kz_yWZkMaEk", vidLabel: "Stats Review" }
+            { area: "math", title: "Álgebra Matricial para Econometría", book: "Simon & Blume Ch. 6-9", 
+              tasks: ["Vectores y Espacios (Independencia Lineal)", "Sistemas Ax=b y Rango", "Determinantes e Inversas"],
+              video: { label: "MIT: Matrix Algebra", url: "https://www.youtube.com/watch?v=ZK3O402wf1c&list=PL49CF3715CB9EF31D" } 
+            },
+            { area: "micro", title: "Teoría del Consumidor", book: "Nicholson & Snyder Ch. 3-4", 
+              tasks: ["Axiomas de preferencias", "Restricción Presupuestaria", "Maximización de Utilidad (Lagrangiano Intro)"],
+              video: { label: "Micro: Consumer Theory", url: "https://www.youtube.com/watch?v=1Y2r36wS01c" } 
+            },
+            { area: "metrics", title: "Repaso Estadístico", book: "Wooldridge Apéndice B", 
+              tasks: ["Esperanza y Varianza (Propiedades)", "Covarianza y Correlación", "Distribución Normal Standard"],
+              video: { label: "Probabilidad Básica", url: "https://www.youtube.com/watch?v=Kz_yWZkMaEk" } 
+            },
+            { area: "macro", title: "Datos e Identidades", book: "De Gregorio Cap. 2", 
+              tasks: ["PIB, Inflación y Desempleo", "Identidades Contables", "Balanza de Pagos"],
+              video: { label: "Macro Data (MRU)", url: "https://www.youtube.com/watch?v=d8uTB5qBntE" } 
+            }
         ]
     },
     {
-        w: 2, title: "Cálculo y OLS Simple",
+        w: 2, title: "Cálculo Multivariable & OLS Simple",
         topics: [
-            { area: "Math", title: "Cálculo Multivariable", desc: "Simon & Blume Cap. 14: Gradiente y Hessiano.", vid: "https://youtu.be/TrcCjyW7xVI", vidLabel: "Khan: Gradient" },
-            { area: "Micro", title: "Demanda y Slutsky", desc: "Nicholson Cap. 5: Efecto Ingreso/Sustitución.", vid: "https://youtu.be/ZUpYvD1O7cI", vidLabel: "Slutsky Decomp" },
-            { area: "Metrics", title: "OLS Simple", desc: "Wooldridge Cap. 2: Derivación de Betas.", vid: "https://youtu.be/b4YlQ912kIs", vidLabel: "Ben Lambert: OLS" }
+            { area: "math", title: "Cálculo Diferencial", book: "Simon & Blume Ch. 14-15", 
+              tasks: ["Derivadas Parciales", "Gradiente y Hessiano", "Convexidad y Concavidad"],
+              video: { label: "Khan: Multivariable", url: "https://www.youtube.com/watch?v=TrcCjyW7xVI" } 
+            },
+            { area: "metrics", title: "Modelo Lineal Simple (OLS)", book: "Wooldridge Cap. 2", 
+              tasks: ["Derivar estimadores B0 y B1", "R-cuadrado", "Supuestos Gauss-Markov (Intro)"],
+              video: { label: "Ben Lambert: OLS Derivation", url: "https://www.youtube.com/watch?v=b4YlQ912kIs" } 
+            },
+            { area: "micro", title: "Demanda y Slutsky", book: "Nicholson Cap. 5-6", 
+              tasks: ["Demanda Marshaliana vs Hicksiana", "Ecuación de Slutsky (Efecto Ingreso/Sustitución)"],
+              video: { label: "Slutsky Equation", url: "https://www.youtube.com/watch?v=ZUpYvD1O7cI" } 
+            },
+            { area: "macro", title: "Modelo de Solow", book: "De Gregorio Cap. 12", 
+              tasks: ["Acumulación de Capital", "Estado Estacionario", "Regla de Oro"],
+              video: { label: "Marginal Rev: Solow", url: "https://www.youtube.com/watch?v=3nK29971D50" } 
+            }
         ]
     },
     {
-        w: 3, title: "Optimización y Regresión Múltiple",
+        w: 3, title: "Optimización & Regresión Múltiple",
         topics: [
-            { area: "Math", title: "Lagrange Multipliers", desc: "Simon & Blume Cap. 18: Opt con Igualdad.", vid: "https://youtu.be/hQ4UNu1P2kw", vidLabel: "Lagrange Intuition" },
-            { area: "Metrics", title: "OLS Múltiple: Sesgo", desc: "Wooldridge Cap. 3: Variable Omitida.", vid: "https://youtu.be/6J_q9C-Vqos", vidLabel: "Omitted Var Bias" },
-            { area: "Macro", title: "Consumo Intertemporal", desc: "De Gregorio Cap. 4: Euler Equation.", vid: "https://youtu.be/Nu49gqg2q3k", vidLabel: "Euler Equation" }
+            { area: "math", title: "Optimización con Restricciones", book: "Simon & Blume Ch. 18", 
+              tasks: ["Multiplicadores de Lagrange", "Interpretación Económica de Lambda", "Condiciones de 2do Orden"],
+              video: { label: "Lagrange Multipliers", url: "https://www.youtube.com/watch?v=hQ4UNu1P2kw" } 
+            },
+            { area: "metrics", title: "Regresión Múltiple: Estimación", book: "Wooldridge Cap. 3", 
+              tasks: ["Interpretación Ceteris Paribus", "Sesgo por Variable Omitida", "Multicolinealidad"],
+              video: { label: "Omitted Variable Bias", url: "https://www.youtube.com/watch?v=6J_q9C-Vqos" } 
+            },
+            { area: "micro", title: "Teoría de la Firma", book: "Nicholson Cap. 9-10", 
+              tasks: ["Minimización de Costos", "Funciones de Costo (Cmg, Cme)", "Oferta de la firma"],
+              video: { label: "Cost Functions", url: "https://www.youtube.com/watch?v=ucJBO9gkUoQ" } 
+            },
+            { area: "macro", title: "Consumo Intertemporal", book: "De Gregorio Cap. 4", 
+              tasks: ["Modelo de 2 periodos", "Restricción presupuestaria intertemporal", "Ecuación de Euler"],
+              video: { label: "Consumption Smoothing", url: "https://www.youtube.com/watch?v=Nu49gqg2q3k" } 
+            }
         ]
     },
     {
-        w: 4, title: "Equilibrio General e Inferencia",
+        w: 4, title: "Equilibrio General & Inferencia",
         topics: [
-            { area: "Micro", title: "Caja de Edgeworth", desc: "Nicholson Cap. 13: Pareto Eficiencia.", vid: "https://youtu.be/QfiYJFxY360", vidLabel: "Edgeworth Box" },
-            { area: "Metrics", title: "Inferencia (Test-t)", desc: "Wooldridge Cap. 4: Pruebas de Hipótesis.", vid: "https://youtu.be/Jjq9a3y8wUk", vidLabel: "Hypothesis Testing" },
-            { area: "Math", title: "Kuhn-Tucker", desc: "Simon & Blume Cap. 19: Desigualdades.", vid: "https://youtu.be/J3yN-eWc-4M", vidLabel: "Kuhn Tucker" }
+            { area: "micro", title: "Equilibrio General e Intercambio", book: "Nicholson Cap. 13", 
+              tasks: ["Caja de Edgeworth", "Eficiencia de Pareto", "Teoremas del Bienestar"],
+              video: { label: "BurkeyAcademy: Edgeworth", url: "https://www.youtube.com/watch?v=QfiYJFxY360" } 
+            },
+            { area: "metrics", title: "Inferencia Estadística", book: "Wooldridge Cap. 4", 
+              tasks: ["Tests de Hipótesis (t-test)", "Intervalos de Confianza", "Significancia Económica vs Estadística"],
+              video: { label: "Hypothesis Testing", url: "https://www.youtube.com/watch?v=Jjq9a3y8wUk" } 
+            },
+            { area: "math", title: "Kuhn-Tucker (Desigualdades)", book: "Simon & Blume Ch. 19", 
+              tasks: ["Condiciones de Holgura", "Teorema de la Envolvente"],
+              video: { label: "Kuhn Tucker Intuition", url: "https://www.youtube.com/watch?v=J3yN-eWc-4M" } 
+            },
+             { area: "macro", title: "Modelo IS-LM", book: "De Gregorio Cap. 14", 
+              tasks: ["Mercado de Bienes (IS)", "Mercado Monetario (LM)", "Política Fiscal y Monetaria"],
+              video: { label: "IS-LM Model", url: "https://www.youtube.com/watch?v=7yK7q1H6i5E" } 
+            }
         ]
     },
     {
-        w: 5, title: "Fallas de Mercado y Asintótica",
+        w: 5, title: "Fallas de Mercado & Asintótica",
         topics: [
-            { area: "Micro", title: "Monopolio", desc: "Nicholson Cap. 14: Discriminación Precios.", vid: "https://youtu.be/Rj3qf_c18Yg", vidLabel: "Price Discrim" },
-            { area: "Metrics", title: "Asintótica (n grande)", desc: "Wooldridge Cap. 5: Consistencia vs Insesgadez.", vid: "https://youtu.be/3RzG6n4MWvw", vidLabel: "Consistency" },
-            { area: "Macro", title: "Modelo IS-LM", desc: "De Gregorio Cap. 14: Shocks Fiscales.", vid: "https://youtu.be/7yK7q1H6i5E", vidLabel: "IS-LM Model" }
+            { area: "micro", title: "Monopolio y Discriminación", book: "Nicholson Cap. 14", 
+              tasks: ["Maximización del Monopolista", "Discriminación de 1er, 2do y 3er grado", "Pérdida de Eficiencia"],
+              video: { label: "Price Discrimination", url: "https://www.youtube.com/watch?v=Rj3qf_c18Yg" } 
+            },
+            { area: "metrics", title: "Asintótica (Muestras Grandes)", book: "Wooldridge Cap. 5", 
+              tasks: ["Consistencia vs Insesgadez", "Convergencia en Probabilidad", "Ley de Grandes Números"],
+              video: { label: "Consistency vs Unbiasedness", url: "https://www.youtube.com/watch?v=3RzG6n4MWvw" } 
+            },
+            { area: "macro", title: "Oferta y Demanda Agregada", book: "De Gregorio Cap. 17", 
+              tasks: ["Curva de Phillips", "Expectativas Racionales", "Shock de Oferta"],
+              video: { label: "AS-AD Model", url: "https://www.youtube.com/watch?v=5lZqX2_XQ34" } 
+            },
+            { area: "math", title: "Ecuaciones Diferenciales", book: "Simon & Blume Ch. 24", 
+              tasks: ["EDO de primer orden", "Diagramas de Fase", "Estabilidad del equilibrio"],
+              video: { label: "Phase Diagrams", url: "https://www.youtube.com/watch?v=P676451eF5M" } 
+            }
         ]
     },
     {
-        w: 6, title: "Bienes Públicos y Heterocedasticidad",
+        w: 6, title: "Externalidades & Heterocedasticidad",
         topics: [
-            { area: "Micro", title: "Externalidades", desc: "Nicholson Cap. 19: Pigou y Coase.", vid: "https://youtu.be/1_3A_r8a-1I", vidLabel: "Public Goods" },
-            { area: "Metrics", title: "Heterocedasticidad", desc: "Wooldridge Cap. 8: Test White y Robust SE.", vid: "https://youtu.be/3M232y_D948", vidLabel: "Robust SE" },
-            { area: "Macro", title: "Pol. Monetaria (Taylor)", desc: "De Gregorio Cap. 19: Reglas de Taylor.", vid: "https://youtu.be/y3qT1_y8y5w", vidLabel: "Taylor Rule" }
+            { area: "micro", title: "Externalidades y Bienes Públicos", book: "Nicholson Cap. 19", 
+              tasks: ["Impuestos Pigouvianos", "Teorema de Coase", "Condición de Samuelson"],
+              video: { label: "Public Goods", url: "https://www.youtube.com/watch?v=1_3A_r8a-1I" } 
+            },
+            { area: "metrics", title: "Heterocedasticidad", book: "Wooldridge Cap. 8", 
+              tasks: ["Detección (Breusch-Pagan/White)", "Errores Estándar Robustos", "GLS (Mínimos Cuadrados Generalizados)"],
+              video: { label: "Heteroskedasticity", url: "https://www.youtube.com/watch?v=3M232y_D948" } 
+            },
+            { area: "macro", title: "Política Monetaria (Taylor)", book: "De Gregorio Cap. 19", 
+              tasks: ["Reglas de Taylor", "Inconsistencia Dinámica", "Banco Central Independiente"],
+              video: { label: "Taylor Rule", url: "https://www.youtube.com/watch?v=y3qT1_y8y5w" } 
+            }
         ]
     },
     {
-        w: 7, title: "Juegos y Series de Tiempo",
+        w: 7, title: "Teoría de Juegos & Series de Tiempo",
         topics: [
-            { area: "Micro", title: "Teoría de Juegos", desc: "Nicholson Cap. 8: Nash Equilibrium.", vid: "https://youtu.be/M8C2d5VvKFE", vidLabel: "Game Theory 101" },
-            { area: "Metrics", title: "Series de Tiempo", desc: "Wooldridge Cap. 10: Estacionariedad.", vid: "https://youtu.be/Y2k6N5yL-n0", vidLabel: "Time Series Intro" }
+            { area: "micro", title: "Teoría de Juegos Estáticos", book: "Nicholson Cap. 8", 
+              tasks: ["Equilibrio de Nash", "Estrategias Dominantes", "Dilema del Prisionero"],
+              video: { label: "Game Theory 101", url: "https://www.youtube.com/watch?v=M8C2d5VvKFE" } 
+            },
+            { area: "metrics", title: "Series de Tiempo Intro", book: "Wooldridge Cap. 10", 
+              tasks: ["Modelos Estáticos vs Dinámicos", "Tendencia y Estacionalidad", "Supuestos TS"],
+              video: { label: "Time Series Intro", url: "https://www.youtube.com/watch?v=Y2k6N5yL-n0" } 
+            },
+            { area: "macro", title: "Crecimiento Endógeno (Intro)", book: "Romer / De Gregorio", 
+              tasks: ["Modelos AK", "Capital Humano", "Innovación y R&D"],
+              video: { label: "Endogenous Growth", url: "https://www.youtube.com/watch?v=sc1-Noyk-jM" } 
+            }
         ]
     },
     {
-        w: 8, title: "Repaso Final",
+        w: 8, title: "Repaso & Simulación Exámenes",
         topics: [
-            { area: "ALL", title: "Exámenes Anteriores", desc: "Resolver pruebas de años pasados.", vid: "", vidLabel: "" },
-            { area: "ALL", title: "Revisión de Errores", desc: "Repasar conceptos débiles.", vid: "", vidLabel: "" }
+            { area: "math", title: "Repaso Final Matemáticas", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null },
+            { area: "micro", title: "Repaso Final Micro", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null },
+            { area: "metrics", title: "Repaso Final Econometría", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null },
+            { area: "macro", title: "Repaso Final Macro", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null }
         ]
     }
 ];
 
-/* ================== LÓGICA DEL SISTEMA ================== */
-const STORAGE_KEY = "fen_commander_v4";
-let state = { startDate: null, checks: {} };
+/* ======================== 2. SISTEMA DE ESTADO ======================== */
+const STORAGE_KEY = "fen_master_tracker_v3";
+let state = {
+    startDate: new Date().toISOString().split('T')[0], 
+    checks: {} 
+};
 
 function init() {
     loadState();
     
-    // Si no hay fecha, mostrar modal setup
-    if (!state.startDate) {
+    // Si es primera vez, pedimos fecha y actualizamos Hero
+    if (!localStorage.getItem(STORAGE_KEY)) {
         document.getElementById("setupModal").style.display = "flex";
-        // Setup inicial del hero dummy
-        updateHeroMessage(0, 0); 
+        document.getElementById("startDateInput").value = state.startDate;
+        analyzeHeroStatus(); // Status inicial dummy
     } else {
-        analyzeProgress(); // Aquí ocurre la magia del dashboard
+        render(); // Renderiza la app (aunque esté oculta)
+        analyzeHeroStatus(); // Calcula el mensaje de la portada
     }
+    
+    // Header date
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById("currentDateDisplay").textContent = new Date().toLocaleDateString('es-ES', options);
 }
 
-// 1. Análisis Matemático del Tiempo
-function analyzeProgress() {
+// LÓGICA PORTADA INTELIGENTE
+function analyzeHeroStatus() {
     const start = new Date(state.startDate);
     const now = new Date();
     
-    // Calcular días pasados
-    const diffTime = Math.abs(now - start);
-    const daysPassed = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-    
-    // Calcular Semana "Ideal" (suponiendo 1 semana por módulo)
-    // Si daysPassed = 5 -> Estamos en semana 1. Si daysPassed = 10 -> Semana 2.
-    let currentWeekIndex = Math.floor(daysPassed / 7) + 1;
-    if(daysPassed < 0) currentWeekIndex = 0; // Aún no empieza
-    if(currentWeekIndex > 8) currentWeekIndex = 8; // Ya terminó el tiempo teórico
+    // Calcular semanas calendario pasadas
+    const diffTime = now - start;
+    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    let currentWeekIdx = Math.floor(daysPassed / 7); 
+    if(daysPassed < 0) currentWeekIdx = -1; // No ha empezado
 
-    // Calcular Progreso Real
-    let totalTopics = 0;
-    let completedTopics = 0;
-    PLAN.forEach((w, idx) => {
-        w.topics.forEach((t, tIdx) => {
-            totalTopics++;
-            if(state.checks[`w${w.w}_${tIdx}`]) completedTopics++;
-        });
-    });
+    // Calcular progreso real (en "semanas completadas")
+    let totalTasks = 0;
+    let completedTasks = 0;
+    PLAN.forEach(w => w.topics.forEach(t => t.tasks.forEach(() => totalTasks++)));
+    completedTasks = Object.keys(state.checks).length;
     
-    // Calcular "Semana de Progreso" (Equivalente)
-    // Si hay 24 topics total y tienes 3 hechos, vas en el 12% -> Semana 1 aprox.
-    const pct = totalTopics === 0 ? 0 : (completedTopics / totalTopics);
-    // Convertir porcentaje a "Semanas Completadas" (aprox)
-    const progressInWeeks = pct * 8; 
+    const progressPct = totalTasks === 0 ? 0 : (completedTasks / totalTasks);
+    const progressWeeks = progressPct * 8; // Equivalente en semanas
 
-    updateHeroMessage(progressInWeeks, currentWeekIndex, Math.round(pct*100));
-    renderApp(pct);
+    // Comparar
+    const diff = progressWeeks - currentWeekIdx; // + voy bien, - voy mal
+    updateHeroMessage(diff, progressPct);
 }
 
-// 2. El Motor de Ánimo (Mensajes)
-function updateHeroMessage(progressWeeks, currentWeekIdx, pct) {
-    const title = document.getElementById("msgTitle");
-    const body = document.getElementById("msgBody");
+function updateHeroMessage(diff, pct) {
     const icon = document.getElementById("heroIcon");
-    const box = document.getElementById("msgBox");
+    const title = document.getElementById("heroStatusTitle");
+    const body = document.getElementById("heroStatusBody");
+    const box = document.getElementById("heroMsgBox");
     const btn = document.querySelector(".enter-btn");
 
-    // Margen de error de 0.5 semanas (3-4 días)
-    const diff = progressWeeks - (currentWeekIdx - 1); // currentWeekIdx 1 es inicio de progreso 0
-
-    // LOGICA DE ESTADO
-    if (pct === 100) {
-        // TERMINADO
+    if (pct >= 1) { // 100%
         icon.textContent = "🎓";
         title.textContent = "MAESTRÍA DESBLOQUEADA";
-        body.textContent = "Has completado la nivelación. Estás listo para destruir el Magíster. ¡Nos vemos en la FEN!";
-        box.style.borderColor = "var(--status-ontrack)";
+        body.textContent = "Has terminado la nivelación. Estás listo para destruir el Magíster. ¡Nos vemos en la FEN!";
         title.style.color = "var(--status-ontrack)";
+        box.style.borderColor = "var(--status-ontrack)";
     } 
-    else if (diff >= 0.5) {
-        // ADELANTADO (Modo Dios)
+    else if (diff >= 0.5) { // Adelantado
         icon.textContent = "⚡";
         title.textContent = "MODO BEAST ACTIVADO";
-        body.textContent = "¡Vas más rápido que el promedio! Tu productividad marginal es explosiva. ¡Sigue así y serás Top de la clase!";
-        box.style.borderColor = "var(--status-ahead)";
+        body.textContent = "¡Vas más rápido que el promedio! Tu productividad marginal es explosiva. Sigue así.";
         title.style.color = "var(--status-ahead)";
+        box.style.borderColor = "var(--status-ahead)";
         btn.style.background = "var(--status-ahead)";
         btn.style.color = "#fff";
     } 
-    else if (diff >= -0.5) {
-        // AL DÍA (On Track)
+    else if (diff >= -0.8) { // Al día (rango tolerable)
         icon.textContent = "✅";
         title.textContent = "RITMO ÓPTIMO";
-        body.textContent = "Vas en línea con el cronograma. Estás maximizando tu utilidad intertemporal perfectamente. ¡Buen trabajo!";
-        box.style.borderColor = "var(--status-ontrack)";
+        body.textContent = "Vas en línea con el cronograma. Estás maximizando tu utilidad intertemporal perfectamente.";
         title.style.color = "var(--status-ontrack)";
+        box.style.borderColor = "var(--status-ontrack)";
         btn.style.background = "var(--status-ontrack)";
     } 
-    else {
-        // ATRASADO (Necesita Ánimo)
+    else { // Atrasado
         icon.textContent = "🐢";
         title.textContent = "VAMOS A RECUPERARNOS";
-        body.textContent = "El costo de oportunidad de no estudiar hoy es altísimo. No te rindas, solo necesitas un par de sesiones intensas para ponerte al día.";
-        box.style.borderColor = "var(--status-behind)";
+        body.textContent = "El costo de oportunidad de no estudiar hoy es alto. Solo necesitas un par de sesiones intensas para volver al track.";
         title.style.color = "var(--status-behind)";
+        box.style.borderColor = "var(--status-behind)";
         btn.style.background = "var(--status-behind)";
         btn.style.color = "#fff";
     }
@@ -329,93 +466,10 @@ function updateHeroMessage(progressWeeks, currentWeekIdx, pct) {
 
 function enterApp() {
     document.getElementById("hero").classList.add("hidden");
-    document.getElementById("app").classList.add("visible");
+    document.getElementById("mainContainer").classList.add("visible");
 }
 
-function renderApp(pct) {
-    document.getElementById("displayPercent").textContent = pct + "%";
-    document.getElementById("displayStartDate").textContent = formatDate(new Date(state.startDate));
-
-    const list = document.getElementById("plannerList");
-    list.innerHTML = "";
-
-    const now = new Date();
-
-    PLAN.forEach((week) => {
-        // Calcular fechas de esta semana específica
-        const wStart = new Date(state.startDate);
-        wStart.setDate(wStart.getDate() + (week.w - 1) * 7);
-        const wEnd = new Date(wStart);
-        wEnd.setDate(wEnd.getDate() + 6);
-
-        // ¿Estamos en esta semana?
-        const isCurrent = (now >= wStart && now <= wEnd);
-        // ¿Ya pasó?
-        const isPast = (now > wEnd);
-        
-        // Crear Card
-        const details = document.createElement("details");
-        details.className = "week-card";
-        if (isCurrent) details.setAttribute("open", "");
-
-        // Header Semanal
-        const dateStr = `${formatDateShort(wStart)} - ${formatDateShort(wEnd)}`;
-        let statusBadge = `<span class="wk-date ${isPast && !isWeekComplete(week) ? 'wk-late' : ''}">${dateStr}</span>`;
-
-        details.innerHTML = `
-            <summary class="week-header">
-                <div class="wk-info">
-                    <span class="wk-title">Semana ${week.w}: ${week.title}</span>
-                    ${statusBadge}
-                </div>
-                <div style="font-size:1.2rem; filter: grayscale(1);">${isWeekComplete(week) ? '✅' : '📚'}</div>
-            </summary>
-            <div id="topics-${week.w}"></div>
-        `;
-
-        // Render Topics
-        const topicContainer = details.querySelector(`#topics-${week.w}`);
-        week.topics.forEach((topic, idx) => {
-            const uid = `w${week.w}_${idx}`;
-            const checked = state.checks[uid] ? "checked" : "";
-            
-            const row = document.createElement("div");
-            row.className = "topic-item";
-            row.innerHTML = `
-                <label class="task-row">
-                    <input type="checkbox" id="${uid}" ${checked} onchange="toggleCheck('${uid}')">
-                    <div class="task-content">
-                        <span class="task-title"><strong style="color:var(--accent)">[${topic.area}]</strong> ${topic.title}</span>
-                        <span class="task-meta">${topic.desc}</span>
-                    </div>
-                </label>
-                ${topic.vid ? `<a href="${topic.vid}" target="_blank" class="yt-btn">▶ Ver Clase: ${topic.vidLabel}</a>` : ''}
-            `;
-            topicContainer.appendChild(row);
-        });
-
-        list.appendChild(details);
-    });
-}
-
-function isWeekComplete(week) {
-    let allDone = true;
-    week.topics.forEach((t, i) => {
-        if(!state.checks[`w${week.w}_${i}`]) allDone = false;
-    });
-    return allDone;
-}
-
-/* ================== UTILS & STORAGE ================== */
-function saveSetup() {
-    const val = document.getElementById("startDateInput").value;
-    if(val) {
-        state.startDate = val;
-        saveState();
-        document.getElementById("setupModal").style.display = "none";
-        analyzeProgress();
-    }
-}
+/* ======================== LÓGICA MASTER TRACKER ======================== */
 
 function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -424,6 +478,121 @@ function loadState() {
 
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    updateKPIs();
+}
+
+function saveSetup() {
+    const val = document.getElementById("startDateInput").value;
+    if(val) {
+        state.startDate = val;
+        saveState();
+        document.getElementById("setupModal").style.display = "none";
+        render();
+        analyzeHeroStatus(); // Recalcular mensaje portada
+    }
+}
+
+function openSetup() {
+    document.getElementById("startDateInput").value = state.startDate;
+    document.getElementById("setupModal").style.display = "flex";
+}
+
+function getDatesForWeek(weekIndex) {
+    const start = new Date(state.startDate);
+    start.setDate(start.getDate() + ((weekIndex-1) * 7));
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const fmt = d => d.getDate().toString().padStart(2,'0') + "/" + (d.getMonth()+1).toString().padStart(2,'0');
+    return `${fmt(start)} - ${fmt(end)}`;
+}
+
+function isCurrentWeek(weekIndex) {
+    const start = new Date(state.startDate);
+    start.setDate(start.getDate() + ((weekIndex-1) * 7));
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    end.setHours(23,59,59);
+    const now = new Date();
+    return now >= start && now <= end;
+}
+
+function render() {
+    const container = document.getElementById("plannerArea");
+    container.innerHTML = "";
+    
+    PLAN.forEach(week => {
+        const dateRange = getDatesForWeek(week.w);
+        const isCurrent = isCurrentWeek(week.w);
+        
+        let wTotal = 0; let wDone = 0;
+        week.topics.forEach(t => {
+            t.tasks.forEach((tsk, i) => {
+                wTotal++;
+                if(state.checks[`w${week.w}_${t.area}_${i}`]) wDone++;
+            });
+        });
+        const wPct = wTotal ? Math.round((wDone/wTotal)*100) : 0;
+        
+        const details = document.createElement("details");
+        details.className = `week-group ${isCurrent ? "active" : ""}`;
+        if(isCurrent) details.setAttribute("open", ""); 
+
+        details.innerHTML = `
+            <summary class="week-header">
+                <div>
+                    <div class="wk-title">Semana ${week.w}: ${week.title}</div>
+                    <div class="wk-dates">${dateRange} ${isCurrent ? "• <span style='color:var(--accent)'>ACTUAL</span>" : ""}</div>
+                </div>
+                <div class="wk-progress">${wPct}%</div>
+            </summary>
+            <div class="topic-list" id="content-w${week.w}"></div>
+        `;
+        
+        const contentDiv = details.querySelector(`#content-w${week.w}`);
+        week.topics.forEach(topic => {
+            let badgeClass = "";
+            if(topic.area === "math") badgeClass = "b-math";
+            else if(topic.area === "micro") badgeClass = "b-micro";
+            else if(topic.area === "macro") badgeClass = "b-macro";
+            else badgeClass = "b-metrics";
+            
+            const card = document.createElement("div");
+            card.className = "topic-card";
+            
+            let tasksHtml = "";
+            topic.tasks.forEach((task, i) => {
+                const uid = `w${week.w}_${topic.area}_${i}`;
+                const checked = state.checks[uid] ? "checked" : "";
+                tasksHtml += `
+                    <label class="task-item">
+                        <input type="checkbox" id="${uid}" ${checked} onchange="toggleCheck('${uid}')">
+                        <span>${task}</span>
+                    </label>
+                `;
+            });
+            
+            let videoHtml = "";
+            if(topic.video) {
+                videoHtml = `
+                    <a href="${topic.video.url}" target="_blank" class="video-btn">
+                        <svg class="video-icon" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+                        Ver Clase: ${topic.video.label}
+                    </a>
+                `;
+            }
+
+            card.innerHTML = `
+                <span class="badge ${badgeClass}">${topic.area.toUpperCase()}</span>
+                <div class="topic-title">${topic.title}</div>
+                <span class="topic-book">📖 ${topic.book}</span>
+                <div class="task-list">${tasksHtml}</div>
+                ${videoHtml}
+            `;
+            contentDiv.appendChild(card);
+        });
+        container.appendChild(details);
+    });
+    updateKPIs();
 }
 
 function toggleCheck(id) {
@@ -431,53 +600,48 @@ function toggleCheck(id) {
     if(el.checked) state.checks[id] = true;
     else delete state.checks[id];
     saveState();
-    // Recalcular para actualizar header sin recargar
-    // (Podemos llamar analyzeProgress pero eso resetearía la vista hero si no tenemos cuidado)
-    // Para simplificar UX, solo actualizamos el % visual del header
-    // Lo ideal es recargar si quieres ver cambios drásticos, pero aquí es sutil.
-    renderApp(calculatePercent());
+    updateKPIs(); 
 }
 
-function calculatePercent() {
+function updateKPIs() {
     let total = 0; let done = 0;
-    PLAN.forEach(w => w.topics.forEach((t, i) => {
-        total++;
-        if(state.checks[`w${w.w}_${i}`]) done++;
-    }));
-    return total ? Math.round((done/total)*100) : 0;
+    PLAN.forEach(w => w.topics.forEach(t => t.tasks.forEach(tsk => total++)));
+    done = Object.keys(state.checks).length;
+    const pct = total ? Math.round((done/total)*100) : 0;
+    
+    document.getElementById("kpiDone").textContent = done;
+    document.getElementById("kpiLeft").textContent = total - done;
+    document.getElementById("headerPercent").textContent = pct + "%";
+    document.getElementById("headerFill").style.width = pct + "%";
 }
 
-function formatDate(d) {
-    return d.toLocaleDateString('es-CL', { day: 'numeric', month: 'long' });
-}
-function formatDateShort(d) {
-    return d.toLocaleDateString('es-CL', { day: 'numeric', month: 'short' });
-}
-
-function resetData() {
-    if(confirm("¿Reiniciar todo?")) {
-        localStorage.removeItem(STORAGE_KEY);
-        location.reload();
-    }
-}
 function exportData() {
-    const a = document.createElement('a');
-    a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-    a.download = "fen_backup.json";
-    a.click();
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const a = document.createElement('a'); a.href = dataStr; a.download = "fen_tracker_backup.json"; a.click();
 }
+
 function importData() {
-    const input = document.createElement('input'); input.type='file';
+    const input = document.createElement('input'); input.type = 'file';
     input.onchange = e => {
-        const r = new FileReader();
-        r.onload = ev => { state = JSON.parse(ev.target.result); saveState(); location.reload(); };
-        r.readAsText(e.target.files[0]);
+        const reader = new FileReader();
+        reader.onload = event => {
+            try { state = JSON.parse(event.target.result); saveState(); render(); alert("Backup cargado."); } 
+            catch(err) { alert("Error al leer archivo"); }
+        };
+        reader.readAsText(e.target.files[0]);
     };
     input.click();
 }
 
-// Start
+function resetData() {
+    if(confirm("¿Estás seguro de borrar todo?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+    }
+}
+
 init();
+
 </script>
 </body>
 </html>
