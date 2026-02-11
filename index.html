@@ -111,8 +111,24 @@
     .b-metrics { background: rgba(121, 192, 255, 0.15); color: var(--c-metrics); border: 1px solid rgba(121, 192, 255, 0.3); }
 
     .topic-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; color: #fff; }
-    .topic-book { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; display: block; font-family: var(--font-mono); }
     
+    /* Nueva info de libros y objetivos */
+    .topic-book { font-size: 0.85rem; color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; }
+    .topic-desc { font-size: 0.8rem; color: var(--text-muted); font-style: italic; display: block; margin-bottom: 10px; }
+    
+    .meta-box {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px;
+        margin-bottom: 12px;
+        font-size: 0.8rem;
+    }
+    .meta-row { display: flex; margin-bottom: 4px; }
+    .meta-row:last-child { margin-bottom: 0; }
+    .meta-label { color: var(--accent); font-weight: 700; width: 70px; flex-shrink: 0; }
+    .meta-val { color: var(--text-muted); }
+
     /* Tasks & Links */
     .task-list { list-style: none; padding: 0; margin: 0; }
     .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 0.9rem; color: var(--text); }
@@ -220,154 +236,258 @@
 </div>
 
 <script>
-/* ======================== 1. DATOS MAESTROS ======================== */
+/* ======================== 1. DATOS MAESTROS (ACTUALIZADO) ======================== */
 const PLAN = [
     {
         w: 1, title: "Fundamentos & Álgebra Matricial",
         topics: [
-            { area: "math", title: "Álgebra Matricial para Econometría", book: "Simon & Blume Ch. 6-9", 
-              tasks: ["Vectores y Espacios (Independencia Lineal)", "Sistemas Ax=b y Rango", "Determinantes e Inversas"],
-              video: { label: "MIT: Matrix Algebra", url: "https://www.youtube.com/watch?v=ZK3O402wf1c&list=PL49CF3715CB9EF31D" } 
+            { 
+                area: "math", title: "Álgebra Matricial para Econometría", book: "Simon & Blume Ch. 6-9", 
+                chapterDesc: "Vectores, espacios vectoriales, determinantes, sistemas lineales e inversa.",
+                objective: "Dominar la notación matricial y entender la independencia lineal para aplicar a datos.",
+                time: "5h",
+                tasks: ["Vectores y Espacios (Independencia Lineal)", "Sistemas Ax=b y Rango", "Determinantes e Inversas"],
+                video: { label: "MIT: Matrix Algebra", url: "https://www.youtube.com/watch?v=ZK3O402wf1c&list=PL49CF3715CB9EF31D" } 
             },
-            { area: "micro", title: "Teoría del Consumidor", book: "Nicholson & Snyder Ch. 3-4", 
-              tasks: ["Axiomas de preferencias", "Restricción Presupuestaria", "Maximización de Utilidad (Lagrangiano Intro)"],
-              video: { label: "Micro: Consumer Theory", url: "https://www.youtube.com/watch?v=1Y2r36wS01c" } 
+            { 
+                area: "micro", title: "Teoría del Consumidor", book: "Nicholson & Snyder Ch. 3-4", 
+                chapterDesc: "Preferencias, utilidad, restricción presupuestaria y maximización.",
+                objective: "Plantear el problema primal del consumidor y derivar demandas marshalianas.",
+                time: "4h",
+                tasks: ["Axiomas de preferencias", "Restricción Presupuestaria", "Maximización de Utilidad (Lagrangiano Intro)"],
+                video: { label: "Micro: Consumer Theory", url: "https://www.youtube.com/watch?v=1Y2r36wS01c" } 
             },
-            { area: "metrics", title: "Repaso Estadístico", book: "Wooldridge Apéndice B", 
-              tasks: ["Esperanza y Varianza (Propiedades)", "Covarianza y Correlación", "Distribución Normal Standard"],
-              video: { label: "Probabilidad Básica", url: "https://www.youtube.com/watch?v=Kz_yWZkMaEk" } 
+            { 
+                area: "metrics", title: "Repaso Estadístico", book: "Wooldridge Apéndice B", 
+                chapterDesc: "Conceptos básicos de probabilidad, valor esperado, varianza y covarianzas.",
+                objective: "Recordar propiedades operatorias de E[x] y Var(x) vitales para OLS.",
+                time: "3h",
+                tasks: ["Esperanza y Varianza (Propiedades)", "Covarianza y Correlación", "Distribución Normal Standard"],
+                video: { label: "Probabilidad Básica", url: "https://www.youtube.com/watch?v=Kz_yWZkMaEk" } 
             },
-            { area: "macro", title: "Datos e Identidades", book: "De Gregorio Cap. 2", 
-              tasks: ["PIB, Inflación y Desempleo", "Identidades Contables", "Balanza de Pagos"],
-              video: { label: "Macro Data (MRU)", url: "https://www.youtube.com/watch?v=d8uTB5qBntE" } 
+            { 
+                area: "macro", title: "Datos e Identidades", book: "De Gregorio Cap. 2", 
+                chapterDesc: "Cuentas nacionales, medición del PIB, inflación, desempleo y balanza de pagos.",
+                objective: "Entender las identidades contables fundamentales de una economía.",
+                time: "3h",
+                tasks: ["PIB, Inflación y Desempleo", "Identidades Contables", "Balanza de Pagos"],
+                video: { label: "Macro Data (MRU)", url: "https://www.youtube.com/watch?v=d8uTB5qBntE" } 
             }
         ]
     },
     {
         w: 2, title: "Cálculo Multivariable & OLS Simple",
         topics: [
-            { area: "math", title: "Cálculo Diferencial", book: "Simon & Blume Ch. 14-15", 
-              tasks: ["Derivadas Parciales", "Gradiente y Hessiano", "Convexidad y Concavidad"],
-              video: { label: "Khan: Multivariable", url: "https://www.youtube.com/watch?v=TrcCjyW7xVI" } 
+            { 
+                area: "math", title: "Cálculo Diferencial", book: "Simon & Blume Ch. 14-15", 
+                chapterDesc: "Derivadas parciales, gradiente, Hessiano, funciones cóncavas y convexas.",
+                objective: "Calcular derivadas parciales y evaluar curvatura de funciones económicas.",
+                time: "5h",
+                tasks: ["Derivadas Parciales", "Gradiente y Hessiano", "Convexidad y Concavidad"],
+                video: { label: "Khan: Multivariable", url: "https://www.youtube.com/watch?v=TrcCjyW7xVI" } 
             },
-            { area: "metrics", title: "Modelo Lineal Simple (OLS)", book: "Wooldridge Cap. 2", 
-              tasks: ["Derivar estimadores B0 y B1", "R-cuadrado", "Supuestos Gauss-Markov (Intro)"],
-              video: { label: "Ben Lambert: OLS Derivation", url: "https://www.youtube.com/watch?v=b4YlQ912kIs" } 
+            { 
+                area: "metrics", title: "Modelo Lineal Simple (OLS)", book: "Wooldridge Cap. 2", 
+                chapterDesc: "Modelo de regresión simple, derivación de MCO, R-cuadrado y valores esperados.",
+                objective: "Derivar algebraicamente los estimadores Beta 0 y Beta 1.",
+                time: "5h",
+                tasks: ["Derivar estimadores B0 y B1", "R-cuadrado", "Supuestos Gauss-Markov (Intro)"],
+                video: { label: "Ben Lambert: OLS Derivation", url: "https://www.youtube.com/watch?v=b4YlQ912kIs" } 
             },
-            { area: "micro", title: "Demanda y Slutsky", book: "Nicholson Cap. 5-6", 
-              tasks: ["Demanda Marshaliana vs Hicksiana", "Ecuación de Slutsky (Efecto Ingreso/Sustitución)"],
-              video: { label: "Slutsky Equation", url: "https://www.youtube.com/watch?v=ZUpYvD1O7cI" } 
+            { 
+                area: "micro", title: "Demanda y Slutsky", book: "Nicholson Cap. 5-6", 
+                chapterDesc: "Efectos ingreso y sustitución, ecuación de Slutsky, relaciones de demanda.",
+                objective: "Descomponer cambios de precios en efectos ingreso y sustitución.",
+                time: "4h",
+                tasks: ["Demanda Marshaliana vs Hicksiana", "Ecuación de Slutsky (Efecto Ingreso/Sustitución)"],
+                video: { label: "Slutsky Equation", url: "https://www.youtube.com/watch?v=ZUpYvD1O7cI" } 
             },
-            { area: "macro", title: "Modelo de Solow", book: "De Gregorio Cap. 12", 
-              tasks: ["Acumulación de Capital", "Estado Estacionario", "Regla de Oro"],
-              video: { label: "Marginal Rev: Solow", url: "https://www.youtube.com/watch?v=3nK29971D50" } 
+            { 
+                area: "macro", title: "Modelo de Solow", book: "De Gregorio Cap. 12", 
+                chapterDesc: "Modelo neoclásico de crecimiento, acumulación de capital y estado estacionario.",
+                objective: "Resolver el estado estacionario del modelo de Solow-Swan.",
+                time: "4h",
+                tasks: ["Acumulación de Capital", "Estado Estacionario", "Regla de Oro"],
+                video: { label: "Marginal Rev: Solow", url: "https://www.youtube.com/watch?v=3nK29971D50" } 
             }
         ]
     },
     {
         w: 3, title: "Optimización & Regresión Múltiple",
         topics: [
-            { area: "math", title: "Optimización con Restricciones", book: "Simon & Blume Ch. 18", 
-              tasks: ["Multiplicadores de Lagrange", "Interpretación Económica de Lambda", "Condiciones de 2do Orden"],
-              video: { label: "Lagrange Multipliers", url: "https://www.youtube.com/watch?v=hQ4UNu1P2kw" } 
+            { 
+                area: "math", title: "Optimización con Restricciones", book: "Simon & Blume Ch. 18", 
+                chapterDesc: "Multiplicadores de Lagrange, condiciones de primer y segundo orden.",
+                objective: "Resolver problemas de optimización con restricciones de igualdad (Lagrange).",
+                time: "5h",
+                tasks: ["Multiplicadores de Lagrange", "Interpretación Económica de Lambda", "Condiciones de 2do Orden"],
+                video: { label: "Lagrange Multipliers", url: "https://www.youtube.com/watch?v=hQ4UNu1P2kw" } 
             },
-            { area: "metrics", title: "Regresión Múltiple: Estimación", book: "Wooldridge Cap. 3", 
-              tasks: ["Interpretación Ceteris Paribus", "Sesgo por Variable Omitida", "Multicolinealidad"],
-              video: { label: "Omitted Variable Bias", url: "https://www.youtube.com/watch?v=6J_q9C-Vqos" } 
+            { 
+                area: "metrics", title: "Regresión Múltiple: Estimación", book: "Wooldridge Cap. 3", 
+                chapterDesc: "Mecánica de MCO con k regresores, sesgo por variable omitida y varianza.",
+                objective: "Entender el sesgo generado por omitir variables relevantes.",
+                time: "5h",
+                tasks: ["Interpretación Ceteris Paribus", "Sesgo por Variable Omitida", "Multicolinealidad"],
+                video: { label: "Omitted Variable Bias", url: "https://www.youtube.com/watch?v=6J_q9C-Vqos" } 
             },
-            { area: "micro", title: "Teoría de la Firma", book: "Nicholson Cap. 9-10", 
-              tasks: ["Minimización de Costos", "Funciones de Costo (Cmg, Cme)", "Oferta de la firma"],
-              video: { label: "Cost Functions", url: "https://www.youtube.com/watch?v=ucJBO9gkUoQ" } 
+            { 
+                area: "micro", title: "Teoría de la Firma", book: "Nicholson Cap. 9-10", 
+                chapterDesc: "Funciones de producción, minimización de costos y maximización de beneficios.",
+                objective: "Derivar funciones de costos (marginal y medio) desde la producción.",
+                time: "4h",
+                tasks: ["Minimización de Costos", "Funciones de Costo (Cmg, Cme)", "Oferta de la firma"],
+                video: { label: "Cost Functions", url: "https://www.youtube.com/watch?v=ucJBO9gkUoQ" } 
             },
-            { area: "macro", title: "Consumo Intertemporal", book: "De Gregorio Cap. 4", 
-              tasks: ["Modelo de 2 periodos", "Restricción presupuestaria intertemporal", "Ecuación de Euler"],
-              video: { label: "Consumption Smoothing", url: "https://www.youtube.com/watch?v=Nu49gqg2q3k" } 
+            { 
+                area: "macro", title: "Consumo Intertemporal", book: "De Gregorio Cap. 4", 
+                chapterDesc: "Elección intertemporal, restricción presupuestaria dinámica y ecuación de Euler.",
+                objective: "Plantear y resolver la ecuación de Euler para el consumo.",
+                time: "4h",
+                tasks: ["Modelo de 2 periodos", "Restricción presupuestaria intertemporal", "Ecuación de Euler"],
+                video: { label: "Consumption Smoothing", url: "https://www.youtube.com/watch?v=Nu49gqg2q3k" } 
             }
         ]
     },
     {
         w: 4, title: "Equilibrio General & Inferencia",
         topics: [
-            { area: "micro", title: "Equilibrio General e Intercambio", book: "Nicholson Cap. 13", 
-              tasks: ["Caja de Edgeworth", "Eficiencia de Pareto", "Teoremas del Bienestar"],
-              video: { label: "BurkeyAcademy: Edgeworth", url: "https://www.youtube.com/watch?v=QfiYJFxY360" } 
+            { 
+                area: "micro", title: "Equilibrio General e Intercambio", book: "Nicholson Cap. 13", 
+                chapterDesc: "Caja de Edgeworth, eficiencia de Pareto y teoremas del bienestar.",
+                objective: "Visualizar el intercambio y definir la eficiencia de Pareto.",
+                time: "4h",
+                tasks: ["Caja de Edgeworth", "Eficiencia de Pareto", "Teoremas del Bienestar"],
+                video: { label: "BurkeyAcademy: Edgeworth", url: "https://www.youtube.com/watch?v=QfiYJFxY360" } 
             },
-            { area: "metrics", title: "Inferencia Estadística", book: "Wooldridge Cap. 4", 
-              tasks: ["Tests de Hipótesis (t-test)", "Intervalos de Confianza", "Significancia Económica vs Estadística"],
-              video: { label: "Hypothesis Testing", url: "https://www.youtube.com/watch?v=Jjq9a3y8wUk" } 
+            { 
+                area: "metrics", title: "Inferencia Estadística", book: "Wooldridge Cap. 4", 
+                chapterDesc: "Distribuciones muestrales, pruebas t, valores p e intervalos de confianza.",
+                objective: "Realizar e interpretar pruebas de hipótesis sobre coeficientes.",
+                time: "5h",
+                tasks: ["Tests de Hipótesis (t-test)", "Intervalos de Confianza", "Significancia Económica vs Estadística"],
+                video: { label: "Hypothesis Testing", url: "https://www.youtube.com/watch?v=Jjq9a3y8wUk" } 
             },
-            { area: "math", title: "Kuhn-Tucker (Desigualdades)", book: "Simon & Blume Ch. 19", 
-              tasks: ["Condiciones de Holgura", "Teorema de la Envolvente"],
-              video: { label: "Kuhn Tucker Intuition", url: "https://www.youtube.com/watch?v=J3yN-eWc-4M" } 
+            { 
+                area: "math", title: "Kuhn-Tucker (Desigualdades)", book: "Simon & Blume Ch. 19", 
+                chapterDesc: "Programación no lineal con restricciones de desigualdad.",
+                objective: "Plantear condiciones de holgura complementaria.",
+                time: "4h",
+                tasks: ["Condiciones de Holgura", "Teorema de la Envolvente"],
+                video: { label: "Kuhn Tucker Intuition", url: "https://www.youtube.com/watch?v=J3yN-eWc-4M" } 
             },
-             { area: "macro", title: "Modelo IS-LM", book: "De Gregorio Cap. 14", 
-              tasks: ["Mercado de Bienes (IS)", "Mercado Monetario (LM)", "Política Fiscal y Monetaria"],
-              video: { label: "IS-LM Model", url: "https://www.youtube.com/watch?v=7yK7q1H6i5E" } 
+             { 
+                area: "macro", title: "Modelo IS-LM", book: "De Gregorio Cap. 14", 
+                chapterDesc: "Mercado de bienes, mercado monetario, equilibrio a corto plazo.",
+                objective: "Analizar política fiscal y monetaria en el corto plazo.",
+                time: "3h",
+                tasks: ["Mercado de Bienes (IS)", "Mercado Monetario (LM)", "Política Fiscal y Monetaria"],
+                video: { label: "IS-LM Model", url: "https://www.youtube.com/watch?v=7yK7q1H6i5E" } 
             }
         ]
     },
     {
         w: 5, title: "Fallas de Mercado & Asintótica",
         topics: [
-            { area: "micro", title: "Monopolio y Discriminación", book: "Nicholson Cap. 14", 
-              tasks: ["Maximización del Monopolista", "Discriminación de 1er, 2do y 3er grado", "Pérdida de Eficiencia"],
-              video: { label: "Price Discrimination", url: "https://www.youtube.com/watch?v=Rj3qf_c18Yg" } 
+            { 
+                area: "micro", title: "Monopolio y Discriminación", book: "Nicholson Cap. 14", 
+                chapterDesc: "Poder de mercado, ingreso marginal y tipos de discriminación de precios.",
+                objective: "Calcular la pérdida de peso muerto y beneficios del monopolista.",
+                time: "4h",
+                tasks: ["Maximización del Monopolista", "Discriminación de 1er, 2do y 3er grado", "Pérdida de Eficiencia"],
+                video: { label: "Price Discrimination", url: "https://www.youtube.com/watch?v=Rj3qf_c18Yg" } 
             },
-            { area: "metrics", title: "Asintótica (Muestras Grandes)", book: "Wooldridge Cap. 5", 
-              tasks: ["Consistencia vs Insesgadez", "Convergencia en Probabilidad", "Ley de Grandes Números"],
-              video: { label: "Consistency vs Unbiasedness", url: "https://www.youtube.com/watch?v=3RzG6n4MWvw" } 
+            { 
+                area: "metrics", title: "Asintótica (Muestras Grandes)", book: "Wooldridge Cap. 5", 
+                chapterDesc: "Consistencia, convergencia en probabilidad y normalidad asintótica.",
+                objective: "Diferenciar entre insesgadez (muestras finitas) y consistencia (muestras grandes).",
+                time: "4h",
+                tasks: ["Consistencia vs Insesgadez", "Convergencia en Probabilidad", "Ley de Grandes Números"],
+                video: { label: "Consistency vs Unbiasedness", url: "https://www.youtube.com/watch?v=3RzG6n4MWvw" } 
             },
-            { area: "macro", title: "Oferta y Demanda Agregada", book: "De Gregorio Cap. 17", 
-              tasks: ["Curva de Phillips", "Expectativas Racionales", "Shock de Oferta"],
-              video: { label: "AS-AD Model", url: "https://www.youtube.com/watch?v=5lZqX2_XQ34" } 
+            { 
+                area: "macro", title: "Oferta y Demanda Agregada", book: "De Gregorio Cap. 17", 
+                chapterDesc: "Modelo OA-DA dinámico, expectativas racionales y curva de Phillips.",
+                objective: "Entender cómo las expectativas afectan el equilibrio macro.",
+                time: "4h",
+                tasks: ["Curva de Phillips", "Expectativas Racionales", "Shock de Oferta"],
+                video: { label: "AS-AD Model", url: "https://www.youtube.com/watch?v=5lZqX2_XQ34" } 
             },
-            { area: "math", title: "Ecuaciones Diferenciales", book: "Simon & Blume Ch. 24", 
-              tasks: ["EDO de primer orden", "Diagramas de Fase", "Estabilidad del equilibrio"],
-              video: { label: "Phase Diagrams", url: "https://www.youtube.com/watch?v=P676451eF5M" } 
+            { 
+                area: "math", title: "Ecuaciones Diferenciales", book: "Simon & Blume Ch. 24", 
+                chapterDesc: "Ecuaciones diferenciales lineales de primer orden y estabilidad.",
+                objective: "Analizar la estabilidad de un sistema dinámico usando diagramas de fase.",
+                time: "3h",
+                tasks: ["EDO de primer orden", "Diagramas de Fase", "Estabilidad del equilibrio"],
+                video: { label: "Phase Diagrams", url: "https://www.youtube.com/watch?v=P676451eF5M" } 
             }
         ]
     },
     {
         w: 6, title: "Externalidades & Heterocedasticidad",
         topics: [
-            { area: "micro", title: "Externalidades y Bienes Públicos", book: "Nicholson Cap. 19", 
-              tasks: ["Impuestos Pigouvianos", "Teorema de Coase", "Condición de Samuelson"],
-              video: { label: "Public Goods", url: "https://www.youtube.com/watch?v=1_3A_r8a-1I" } 
+            { 
+                area: "micro", title: "Externalidades y Bienes Públicos", book: "Nicholson Cap. 19", 
+                chapterDesc: "Ineficiencia del mercado, soluciones privadas (Coase) y públicas (Pigou).",
+                objective: "Modelar externalidades y calcular el impuesto Pigouviano óptimo.",
+                time: "4h",
+                tasks: ["Impuestos Pigouvianos", "Teorema de Coase", "Condición de Samuelson"],
+                video: { label: "Public Goods", url: "https://www.youtube.com/watch?v=1_3A_r8a-1I" } 
             },
-            { area: "metrics", title: "Heterocedasticidad", book: "Wooldridge Cap. 8", 
-              tasks: ["Detección (Breusch-Pagan/White)", "Errores Estándar Robustos", "GLS (Mínimos Cuadrados Generalizados)"],
-              video: { label: "Heteroskedasticity", url: "https://www.youtube.com/watch?v=3M232y_D948" } 
+            { 
+                area: "metrics", title: "Heterocedasticidad", book: "Wooldridge Cap. 8", 
+                chapterDesc: "Varianza del error no constante, tests de detección y corrección.",
+                objective: "Detectar heterocedasticidad y aplicar errores estándar robustos.",
+                time: "4h",
+                tasks: ["Detección (Breusch-Pagan/White)", "Errores Estándar Robustos", "GLS (Mínimos Cuadrados Generalizados)"],
+                video: { label: "Heteroskedasticity", url: "https://www.youtube.com/watch?v=3M232y_D948" } 
             },
-            { area: "macro", title: "Política Monetaria (Taylor)", book: "De Gregorio Cap. 19", 
-              tasks: ["Reglas de Taylor", "Inconsistencia Dinámica", "Banco Central Independiente"],
-              video: { label: "Taylor Rule", url: "https://www.youtube.com/watch?v=y3qT1_y8y5w" } 
+            { 
+                area: "macro", title: "Política Monetaria (Taylor)", book: "De Gregorio Cap. 19", 
+                chapterDesc: "Bancos centrales, objetivos de inflación y reglas de política.",
+                objective: "Analizar la regla de Taylor y el principio de Taylor.",
+                time: "3h",
+                tasks: ["Reglas de Taylor", "Inconsistencia Dinámica", "Banco Central Independiente"],
+                video: { label: "Taylor Rule", url: "https://www.youtube.com/watch?v=y3qT1_y8y5w" } 
             }
         ]
     },
     {
         w: 7, title: "Teoría de Juegos & Series de Tiempo",
         topics: [
-            { area: "micro", title: "Teoría de Juegos Estáticos", book: "Nicholson Cap. 8", 
-              tasks: ["Equilibrio de Nash", "Estrategias Dominantes", "Dilema del Prisionero"],
-              video: { label: "Game Theory 101", url: "https://www.youtube.com/watch?v=M8C2d5VvKFE" } 
+            { 
+                area: "micro", title: "Teoría de Juegos Estáticos", book: "Nicholson Cap. 8", 
+                chapterDesc: "Juegos en forma normal, estrategias puras y mixtas.",
+                objective: "Encontrar el Equilibrio de Nash en juegos simultáneos.",
+                time: "4h",
+                tasks: ["Equilibrio de Nash", "Estrategias Dominantes", "Dilema del Prisionero"],
+                video: { label: "Game Theory 101", url: "https://www.youtube.com/watch?v=M8C2d5VvKFE" } 
             },
-            { area: "metrics", title: "Series de Tiempo Intro", book: "Wooldridge Cap. 10", 
-              tasks: ["Modelos Estáticos vs Dinámicos", "Tendencia y Estacionalidad", "Supuestos TS"],
-              video: { label: "Time Series Intro", url: "https://www.youtube.com/watch?v=Y2k6N5yL-n0" } 
+            { 
+                area: "metrics", title: "Series de Tiempo Intro", book: "Wooldridge Cap. 10", 
+                chapterDesc: "Datos de series temporales, estacionariedad y tendencias.",
+                objective: "Diferenciar entre procesos estacionarios y no estacionarios.",
+                time: "4h",
+                tasks: ["Modelos Estáticos vs Dinámicos", "Tendencia y Estacionalidad", "Supuestos TS"],
+                video: { label: "Time Series Intro", url: "https://www.youtube.com/watch?v=Y2k6N5yL-n0" } 
             },
-            { area: "macro", title: "Crecimiento Endógeno (Intro)", book: "Romer / De Gregorio", 
-              tasks: ["Modelos AK", "Capital Humano", "Innovación y R&D"],
-              video: { label: "Endogenous Growth", url: "https://www.youtube.com/watch?v=sc1-Noyk-jM" } 
+            { 
+                area: "macro", title: "Crecimiento Endógeno (Intro)", book: "Romer / De Gregorio", 
+                chapterDesc: "Modelos AK, externalidades del capital e innovación.",
+                objective: "Contrastar crecimiento exógeno vs endógeno.",
+                time: "3h",
+                tasks: ["Modelos AK", "Capital Humano", "Innovación y R&D"],
+                video: { label: "Endogenous Growth", url: "https://www.youtube.com/watch?v=sc1-Noyk-jM" } 
             }
         ]
     },
     {
         w: 8, title: "Repaso & Simulación Exámenes",
         topics: [
-            { area: "math", title: "Repaso Final Matemáticas", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null },
-            { area: "micro", title: "Repaso Final Micro", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null },
-            { area: "metrics", title: "Repaso Final Econometría", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null },
-            { area: "macro", title: "Repaso Final Macro", book: "Cuadernos", tasks: ["Resolver Examen Año Anterior"], video: null }
+            { area: "math", title: "Repaso Final Matemáticas", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null },
+            { area: "micro", title: "Repaso Final Micro", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null },
+            { area: "metrics", title: "Repaso Final Econometría", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null },
+            { area: "macro", title: "Repaso Final Macro", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null }
         ]
     }
 ];
@@ -585,6 +705,13 @@ function render() {
                 <span class="badge ${badgeClass}">${topic.area.toUpperCase()}</span>
                 <div class="topic-title">${topic.title}</div>
                 <span class="topic-book">📖 ${topic.book}</span>
+                <span class="topic-desc">${topic.chapterDesc}</span>
+                
+                <div class="meta-box">
+                    <div class="meta-row"><span class="meta-label">OBJETIVO:</span> <span class="meta-val">${topic.objective}</span></div>
+                    <div class="meta-row"><span class="meta-label">TIEMPO:</span> <span class="meta-val">${topic.time}</span></div>
+                </div>
+
                 <div class="task-list">${tasksHtml}</div>
                 ${videoHtml}
             `;
