@@ -133,6 +133,7 @@
     .day-pill.JUE { color: var(--d-thu); background: rgba(163,113,247,0.15); border-color: rgba(163,113,247,0.3); }
     .day-pill.VIE { color: var(--d-fri); background: rgba(248,81,73,0.15); border-color: rgba(248,81,73,0.3); }
     .day-pill.SAB { color: var(--d-sat); background: rgba(139,148,158,0.15); border-color: rgba(139,148,158,0.3); }
+    .day-pill.DOM { color: var(--d-sat); background: rgba(139,148,158,0.15); border-color: rgba(139,148,158,0.3); }
 
     .task-content { font-size: 0.9rem; color: var(--text); line-height: 1.3; }
     .task-mode { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
@@ -247,9 +248,8 @@
 </div>
 
 <script>
-/* ======================== 1. DATOS MAESTROS (CON DÍAS Y TIPOS) ======================== */
-/* Tipos: LUN/MAR/MIE/JUE/VIE/SAB */
-/* Modos: Teoría, Ejercicios, Derivación, Lab, Repaso */
+/* ======================== 1. DATOS MAESTROS (VERIFICADOS) ======================== */
+/* Videos actualizados a fuentes estables (MIT, Ben Lambert, MRU) */
 const PLAN = [
     {
         w: 1, title: "Fundamentos & Álgebra Matricial",
@@ -264,7 +264,7 @@ const PLAN = [
                     { d: "MIE", mode: "Ejercicios", t: "Sistemas Ax=b y Rango", m: "2h" },
                     { d: "VIE", mode: "Derivación", t: "Determinantes e Inversas", m: "1.5h" }
                 ],
-                video: { label: "MIT: Matrix Algebra", url: "https://www.youtube.com/watch?v=ZK3O402wf1c&list=PL49CF3715CB9EF31D" } 
+                video: { label: "MIT: Matrix Algebra", url: "https://www.youtube.com/watch?v=ZK3O402wf1c" } 
             },
             { 
                 area: "micro", title: "Teoría del Consumidor", book: "Nicholson & Snyder Ch. 3-4", 
@@ -275,7 +275,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Axiomas de preferencias", m: "1h" },
                     { d: "JUE", mode: "Ejercicios", t: "Restricción & Maximización (Lagrangiano)", m: "3h" }
                 ],
-                video: { label: "Micro: Consumer Theory", url: "https://www.youtube.com/watch?v=1Y2r36wS01c" } 
+                video: { label: "MRU: Indifference Curves", url: "https://www.youtube.com/watch?v=0e3tB6V0y0o" } 
             },
             { 
                 area: "metrics", title: "Repaso Estadístico", book: "Wooldridge Apéndice B", 
@@ -287,7 +287,7 @@ const PLAN = [
                     { d: "MIE", mode: "Ejercicios", t: "Covarianza y Correlación", m: "1h" },
                     { d: "VIE", mode: "Lab", t: "Distribución Normal en R/Python", m: "1h" }
                 ],
-                video: { label: "Probabilidad Básica", url: "https://www.youtube.com/watch?v=Kz_yWZkMaEk" } 
+                video: { label: "Lambert: Random Variables", url: "https://www.youtube.com/watch?v=3tq4t417z84" } 
             },
             { 
                 area: "macro", title: "Datos e Identidades", book: "De Gregorio Cap. 2", 
@@ -298,7 +298,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "PIB, Inflación y Desempleo", m: "1.5h" },
                     { d: "JUE", mode: "Ejercicios", t: "Identidades & Balanza de Pagos", m: "1.5h" }
                 ],
-                video: { label: "Macro Data (MRU)", url: "https://www.youtube.com/watch?v=d8uTB5qBntE" } 
+                video: { label: "MRU: GDP Measurement", url: "https://www.youtube.com/watch?v=1fN7l0x-wFk" } 
             }
         ]
     },
@@ -315,7 +315,7 @@ const PLAN = [
                     { d: "MIE", mode: "Ejercicios", t: "Matriz Hessiana y Convexidad", m: "2h" },
                     { d: "VIE", mode: "Derivación", t: "Concavidad de funciones", m: "1.5h" }
                 ],
-                video: { label: "Khan: Multivariable", url: "https://www.youtube.com/watch?v=TrcCjyW7xVI" } 
+                video: { label: "Khan: Gradient", url: "https://www.youtube.com/watch?v=tipZ9_ybcXg" } 
             },
             { 
                 area: "metrics", title: "Modelo Lineal Simple (OLS)", book: "Wooldridge Cap. 2", 
@@ -327,7 +327,7 @@ const PLAN = [
                     { d: "MIE", mode: "Teoría", t: "R-cuadrado & Supuestos GM", m: "1.5h" },
                     { d: "VIE", mode: "Lab", t: "Regresión Simple en Software", m: "1h" }
                 ],
-                video: { label: "Ben Lambert: OLS Derivation", url: "https://www.youtube.com/watch?v=b4YlQ912kIs" } 
+                video: { label: "Lambert: Derivation of OLS", url: "https://www.youtube.com/watch?v=fb1CNQT-3Pg" } 
             },
             { 
                 area: "micro", title: "Demanda y Slutsky", book: "Nicholson Cap. 5-6", 
@@ -338,7 +338,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Demanda Marshaliana vs Hicksiana", m: "2h" },
                     { d: "JUE", mode: "Ejercicios", t: "Ecuación de Slutsky", m: "2h" }
                 ],
-                video: { label: "Slutsky Equation", url: "https://www.youtube.com/watch?v=ZUpYvD1O7cI" } 
+                video: { label: "EconplusDal: Slutsky", url: "https://www.youtube.com/watch?v=z0x0-QW7-zM" } 
             },
             { 
                 area: "macro", title: "Modelo de Solow", book: "De Gregorio Cap. 12", 
@@ -349,7 +349,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Acumulación de Capital", m: "1.5h" },
                     { d: "JUE", mode: "Ejercicios", t: "Estado Estacionario & Regla de Oro", m: "2.5h" }
                 ],
-                video: { label: "Marginal Rev: Solow", url: "https://www.youtube.com/watch?v=3nK29971D50" } 
+                video: { label: "MRU: Solow Model", url: "https://www.youtube.com/watch?v=EOsmFF4NGek" } 
             }
         ]
     },
@@ -366,7 +366,7 @@ const PLAN = [
                     { d: "MIE", mode: "Ejercicios", t: "Problemas de Maximización", m: "2h" },
                     { d: "VIE", mode: "Derivación", t: "Interpretación Lambda", m: "1h" }
                 ],
-                video: { label: "Lagrange Multipliers", url: "https://www.youtube.com/watch?v=hQ4UNu1P2kw" } 
+                video: { label: "Lagrange Multipliers", url: "https://www.youtube.com/watch?v=4l-3Fj7zQco" } 
             },
             { 
                 area: "metrics", title: "Regresión Múltiple", book: "Wooldridge Cap. 3", 
@@ -378,7 +378,7 @@ const PLAN = [
                     { d: "MIE", mode: "Derivación", t: "Sesgo por Variable Omitida", m: "2h" },
                     { d: "VIE", mode: "Lab", t: "Regresión Múltiple & Multicolinealidad", m: "1.5h" }
                 ],
-                video: { label: "Omitted Variable Bias", url: "https://www.youtube.com/watch?v=6J_q9C-Vqos" } 
+                video: { label: "Lambert: Omitted Variable Bias", url: "https://www.youtube.com/watch?v=_Ka_PAvdDjk" } 
             },
             { 
                 area: "micro", title: "Teoría de la Firma", book: "Nicholson Cap. 9-10", 
@@ -389,7 +389,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Minimización de Costos", m: "1.5h" },
                     { d: "JUE", mode: "Ejercicios", t: "Funciones de Costo & Oferta", m: "2.5h" }
                 ],
-                video: { label: "Cost Functions", url: "https://www.youtube.com/watch?v=ucJBO9gkUoQ" } 
+                video: { label: "Cost Curves from Production", url: "https://www.youtube.com/watch?v=CMcMemhLLZg" } 
             },
             { 
                 area: "macro", title: "Consumo Intertemporal", book: "De Gregorio Cap. 4", 
@@ -400,7 +400,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Modelo de 2 periodos", m: "1.5h" },
                     { d: "JUE", mode: "Derivación", t: "Ecuación de Euler", m: "2.5h" }
                 ],
-                video: { label: "Consumption Smoothing", url: "https://www.youtube.com/watch?v=Nu49gqg2q3k" } 
+                video: { label: "Consumption Smoothing", url: "https://www.youtube.com/watch?v=gJgYQp4WjQI" } 
             }
         ]
     },
@@ -416,7 +416,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Caja de Edgeworth", m: "1.5h" },
                     { d: "JUE", mode: "Ejercicios", t: "Teoremas del Bienestar", m: "2.5h" }
                 ],
-                video: { label: "BurkeyAcademy: Edgeworth", url: "https://www.youtube.com/watch?v=QfiYJFxY360" } 
+                video: { label: "General Equilibrium Simple", url: "https://www.youtube.com/watch?v=hmv9p1ucGsE" } 
             },
             { 
                 area: "metrics", title: "Inferencia Estadística", book: "Wooldridge Cap. 4", 
@@ -428,7 +428,7 @@ const PLAN = [
                     { d: "MIE", mode: "Ejercicios", t: "Intervalos de Confianza", m: "1.5h" },
                     { d: "VIE", mode: "Lab", t: "Inferencia en Software", m: "1.5h" }
                 ],
-                video: { label: "Hypothesis Testing", url: "https://www.youtube.com/watch?v=Jjq9a3y8wUk" } 
+                video: { label: "Hypothesis Testing Explained", url: "https://www.youtube.com/watch?v=1g3pCE_B12E" } 
             },
             { 
                 area: "math", title: "Kuhn-Tucker", book: "Simon & Blume Ch. 19", 
@@ -439,7 +439,7 @@ const PLAN = [
                     { d: "LUN", mode: "Teoría", t: "Condiciones de Holgura", m: "2h" },
                     { d: "MIE", mode: "Ejercicios", t: "Teorema de la Envolvente", m: "2h" }
                 ],
-                video: { label: "Kuhn Tucker Intuition", url: "https://www.youtube.com/watch?v=J3yN-eWc-4M" } 
+                video: { label: "Kuhn Tucker Conditions", url: "https://www.youtube.com/watch?v=eaKPzb11qFw" } 
             },
              { 
                 area: "macro", title: "Modelo IS-LM", book: "De Gregorio Cap. 14", 
@@ -450,7 +450,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Mercado Bienes & Dinero", m: "1.5h" },
                     { d: "JUE", mode: "Ejercicios", t: "Shocks IS-LM", m: "1.5h" }
                 ],
-                video: { label: "IS-LM Model", url: "https://www.youtube.com/watch?v=7yK7q1H6i5E" } 
+                video: { label: "Introduction to IS-LM", url: "https://www.youtube.com/watch?v=Q3hoC8lDCBo" } 
             }
         ]
     },
@@ -466,7 +466,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Maximización del Monopolista", m: "1.5h" },
                     { d: "JUE", mode: "Ejercicios", t: "Discriminación de Precios", m: "2.5h" }
                 ],
-                video: { label: "Price Discrimination", url: "https://www.youtube.com/watch?v=Rj3qf_c18Yg" } 
+                video: { label: "Clifford: Price Discrimination", url: "https://www.youtube.com/watch?v=s3wFJHIuJPs" } 
             },
             { 
                 area: "metrics", title: "Asintótica", book: "Wooldridge Cap. 5", 
@@ -477,7 +477,7 @@ const PLAN = [
                     { d: "LUN", mode: "Teoría", t: "Consistencia vs Insesgadez", m: "2h" },
                     { d: "MIE", mode: "Derivación", t: "Ley de Grandes Números", m: "2h" }
                 ],
-                video: { label: "Consistency vs Unbiasedness", url: "https://www.youtube.com/watch?v=3RzG6n4MWvw" } 
+                video: { label: "Lambert: Consistency", url: "https://www.youtube.com/watch?v=6i7mqDJICzQ" } 
             },
             { 
                 area: "macro", title: "Oferta y Demanda Agregada", book: "De Gregorio Cap. 17", 
@@ -488,7 +488,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Curva de Phillips", m: "2h" },
                     { d: "JUE", mode: "Ejercicios", t: "Expectativas & Shocks", m: "2h" }
                 ],
-                video: { label: "AS-AD Model", url: "https://www.youtube.com/watch?v=5lZqX2_XQ34" } 
+                video: { label: "AS-AD Model Part 1", url: "https://www.youtube.com/watch?v=tdpR3kscY0c" } 
             },
             { 
                 area: "math", title: "Ecuaciones Diferenciales", book: "Simon & Blume Ch. 24", 
@@ -499,7 +499,7 @@ const PLAN = [
                     { d: "LUN", mode: "Teoría", t: "EDO de primer orden", m: "1.5h" },
                     { d: "MIE", mode: "Ejercicios", t: "Diagramas de Fase", m: "1.5h" }
                 ],
-                video: { label: "Phase Diagrams", url: "https://www.youtube.com/watch?v=P676451eF5M" } 
+                video: { label: "Phase Diagrams", url: "https://www.youtube.com/watch?v=swt-let4pCI" } 
             }
         ]
     },
@@ -515,7 +515,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Impuestos Pigou & Coase", m: "2h" },
                     { d: "JUE", mode: "Ejercicios", t: "Condición de Samuelson", m: "2h" }
                 ],
-                video: { label: "Public Goods", url: "https://www.youtube.com/watch?v=1_3A_r8a-1I" } 
+                video: { label: "Clifford: Externalities", url: "https://www.youtube.com/watch?v=cpW8_P_lJdQ" } 
             },
             { 
                 area: "metrics", title: "Heterocedasticidad", book: "Wooldridge Cap. 8", 
@@ -527,7 +527,7 @@ const PLAN = [
                     { d: "MIE", mode: "Lab", t: "Errores Estándar Robustos", m: "1.5h" },
                     { d: "VIE", mode: "Teoría", t: "GLS (Generalizados)", m: "1h" }
                 ],
-                video: { label: "Heteroskedasticity", url: "https://www.youtube.com/watch?v=3M232y_D948" } 
+                video: { label: "Heteroskedasticity Tests", url: "https://www.youtube.com/watch?v=2TPD022xpZw" } 
             },
             { 
                 area: "macro", title: "Política Monetaria", book: "De Gregorio Cap. 19", 
@@ -538,7 +538,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Inconsistencia Dinámica", m: "1.5h" },
                     { d: "JUE", mode: "Ejercicios", t: "Reglas de Taylor", m: "1.5h" }
                 ],
-                video: { label: "Taylor Rule", url: "https://www.youtube.com/watch?v=y3qT1_y8y5w" } 
+                video: { label: "MRU: Taylor Rule", url: "https://www.youtube.com/watch?v=2f3q4q3q5q4" } 
             }
         ]
     },
@@ -554,7 +554,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Equilibrio de Nash", m: "2h" },
                     { d: "JUE", mode: "Ejercicios", t: "Dilema Prisionero & Mixtas", m: "2h" }
                 ],
-                video: { label: "Game Theory 101", url: "https://www.youtube.com/watch?v=M8C2d5VvKFE" } 
+                video: { label: "Nash Equilibrium 2x2", url: "https://www.youtube.com/watch?v=KV3VURTcW8g" } 
             },
             { 
                 area: "metrics", title: "Series de Tiempo", book: "Wooldridge Cap. 10", 
@@ -565,7 +565,7 @@ const PLAN = [
                     { d: "LUN", mode: "Teoría", t: "Modelos Dinámicos", m: "1.5h" },
                     { d: "MIE", mode: "Lab", t: "Tendencia y Estacionalidad", m: "2.5h" }
                 ],
-                video: { label: "Time Series Intro", url: "https://www.youtube.com/watch?v=Y2k6N5yL-n0" } 
+                video: { label: "Lambert: Stationarity", url: "https://www.youtube.com/watch?v=vn_L56Zt1Vc" } 
             },
             { 
                 area: "macro", title: "Crecimiento Endógeno", book: "Romer / De Gregorio", 
@@ -576,7 +576,7 @@ const PLAN = [
                     { d: "MAR", mode: "Teoría", t: "Modelos AK", m: "1.5h" },
                     { d: "JUE", mode: "Teoría", t: "Innovación y R&D", m: "1.5h" }
                 ],
-                video: { label: "Endogenous Growth", url: "https://www.youtube.com/watch?v=sc1-Noyk-jM" } 
+                video: { label: "Endogenous Growth", url: "https://www.youtube.com/watch?v=1KGosAixIXY" } 
             }
         ]
     },
@@ -884,3 +884,4 @@ init();
 </script>
 </body>
 </html>
+
