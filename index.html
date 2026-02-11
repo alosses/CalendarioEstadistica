@@ -10,16 +10,16 @@
         --border: #30363d; --text: #c9d1d9; --text-muted: #8b949e;
         --accent: #58a6ff; --success: #238636; --warning: #d29922; --danger: #f85149;
         
-        /* Estados de Ánimo (Portada) */
+        /* Estados de Ánimo */
         --status-behind: #f85149; 
         --status-ontrack: #2ea043; 
         --status-ahead: #db61a2; 
 
         /* Colores por Área */
-        --c-math: #7ee787;   /* Verde Matrix */
-        --c-micro: #f0883e;  /* Naranja Utility */
-        --c-macro: #d2a8ff;  /* Morado Growth */
-        --c-metrics: #79c0ff;/* Azul OLS */
+        --c-math: #7ee787;   
+        --c-micro: #f0883e;  
+        --c-macro: #d2a8ff;  
+        --c-metrics: #79c0ff;
 
         --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
         --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -28,7 +28,7 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg); color: var(--text); font-family: var(--font-main); margin: 0; padding-bottom: 80px; }
     
-    /* --- 1. PORTADA INTELIGENTE (HERO SCREEN) --- */
+    /* --- 1. PORTADA INTELIGENTE --- */
     .hero-screen {
         position: fixed; inset: 0; z-index: 2000;
         background: radial-gradient(circle at top, #1f242c 0%, #0d1117 100%);
@@ -61,7 +61,7 @@
     .enter-btn:hover { transform: scale(1.05); }
     .enter-btn:active { transform: scale(0.95); }
 
-    /* --- 2. HEADER APP INTERNA --- */
+    /* --- 2. HEADER APP --- */
     .sticky-header {
         position: sticky; top: 0; z-index: 100;
         background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(10px);
@@ -75,7 +75,7 @@
     .prog-container { height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; position: relative; }
     .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); width: 0%; transition: width 0.4s ease; }
     
-    /* --- 3. LAYOUT & GRID --- */
+    /* --- 3. LAYOUT --- */
     .container { max-width: 1000px; margin: 0 auto; padding: 16px; opacity: 0; transition: opacity 0.5s ease 0.3s; }
     .container.visible { opacity: 1; }
 
@@ -84,7 +84,7 @@
     .stat-val { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: #fff; }
     .stat-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* --- 4. WEEK ACCORDION --- */
+    /* --- 4. ACCORDION --- */
     .week-group { margin-bottom: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow: hidden; transition: border-color 0.2s; }
     .week-group.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
     
@@ -97,7 +97,7 @@
     .wk-dates { font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); }
     .wk-progress { font-size: 0.75rem; font-weight: 600; color: var(--accent); }
 
-    /* --- 5. TOPIC CARDS --- */
+    /* --- 5. CARDS & TASKS --- */
     .topic-list { display: grid; grid-template-columns: 1fr; }
     @media (min-width: 768px) { .topic-list { grid-template-columns: 1fr 1fr; } }
     
@@ -111,32 +111,37 @@
     .b-metrics { background: rgba(121, 192, 255, 0.15); color: var(--c-metrics); border: 1px solid rgba(121, 192, 255, 0.3); }
 
     .topic-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; color: #fff; }
-    
-    /* Nueva info de libros y objetivos */
     .topic-book { font-size: 0.85rem; color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; }
     .topic-desc { font-size: 0.8rem; color: var(--text-muted); font-style: italic; display: block; margin-bottom: 10px; }
     
     .meta-box {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 8px;
-        margin-bottom: 12px;
-        font-size: 0.8rem;
+        background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+        border-radius: 6px; padding: 8px; margin-bottom: 12px; font-size: 0.8rem;
     }
     .meta-row { display: flex; margin-bottom: 4px; }
     .meta-row:last-child { margin-bottom: 0; }
     .meta-label { color: var(--accent); font-weight: 700; width: 70px; flex-shrink: 0; }
     .meta-val { color: var(--text-muted); }
 
-    /* Tasks & Links */
+    /* TASKS UPDATED */
     .task-list { list-style: none; padding: 0; margin: 0; }
-    .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 0.9rem; color: var(--text); }
+    .task-item { 
+        display: flex; align-items: center; justify-content: space-between; 
+        padding: 8px 0; font-size: 0.9rem; color: var(--text); 
+        border-bottom: 1px dashed rgba(255,255,255,0.05);
+    }
+    .task-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+    
+    .task-time-badge {
+        font-family: var(--font-mono); font-size: 0.75rem; 
+        color: var(--accent); background: rgba(88, 166, 255, 0.1); 
+        padding: 2px 6px; border-radius: 4px; white-space: nowrap; margin-left: 8px;
+    }
     
     input[type="checkbox"] {
         appearance: none; -webkit-appearance: none;
         width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 5px; flex-shrink: 0;
-        background: #0d1117; cursor: pointer; position: relative; margin-top: 2px;
+        background: #0d1117; cursor: pointer; position: relative;
     }
     input[type="checkbox"]:checked { background: var(--success); border-color: var(--success); }
     input[type="checkbox"]:checked::after {
@@ -236,7 +241,7 @@
 </div>
 
 <script>
-/* ======================== 1. DATOS MAESTROS (ACTUALIZADO) ======================== */
+/* ======================== 1. DATOS MAESTROS (CON TIEMPOS POR TAREA) ======================== */
 const PLAN = [
     {
         w: 1, title: "Fundamentos & Álgebra Matricial",
@@ -246,7 +251,11 @@ const PLAN = [
                 chapterDesc: "Vectores, espacios vectoriales, determinantes, sistemas lineales e inversa.",
                 objective: "Dominar la notación matricial y entender la independencia lineal para aplicar a datos.",
                 time: "5h",
-                tasks: ["Vectores y Espacios (Independencia Lineal)", "Sistemas Ax=b y Rango", "Determinantes e Inversas"],
+                tasks: [
+                    { t: "Vectores y Espacios (Independencia Lineal)", m: "1.5h" },
+                    { t: "Sistemas Ax=b y Rango", m: "2h" },
+                    { t: "Determinantes e Inversas", m: "1.5h" }
+                ],
                 video: { label: "MIT: Matrix Algebra", url: "https://www.youtube.com/watch?v=ZK3O402wf1c&list=PL49CF3715CB9EF31D" } 
             },
             { 
@@ -254,7 +263,11 @@ const PLAN = [
                 chapterDesc: "Preferencias, utilidad, restricción presupuestaria y maximización.",
                 objective: "Plantear el problema primal del consumidor y derivar demandas marshalianas.",
                 time: "4h",
-                tasks: ["Axiomas de preferencias", "Restricción Presupuestaria", "Maximización de Utilidad (Lagrangiano Intro)"],
+                tasks: [
+                    { t: "Axiomas de preferencias", m: "1h" },
+                    { t: "Restricción Presupuestaria", m: "1.5h" },
+                    { t: "Maximización de Utilidad (Lagrangiano Intro)", m: "1.5h" }
+                ],
                 video: { label: "Micro: Consumer Theory", url: "https://www.youtube.com/watch?v=1Y2r36wS01c" } 
             },
             { 
@@ -262,7 +275,11 @@ const PLAN = [
                 chapterDesc: "Conceptos básicos de probabilidad, valor esperado, varianza y covarianzas.",
                 objective: "Recordar propiedades operatorias de E[x] y Var(x) vitales para OLS.",
                 time: "3h",
-                tasks: ["Esperanza y Varianza (Propiedades)", "Covarianza y Correlación", "Distribución Normal Standard"],
+                tasks: [
+                    { t: "Esperanza y Varianza (Propiedades)", m: "1h" },
+                    { t: "Covarianza y Correlación", m: "1h" },
+                    { t: "Distribución Normal Standard", m: "1h" }
+                ],
                 video: { label: "Probabilidad Básica", url: "https://www.youtube.com/watch?v=Kz_yWZkMaEk" } 
             },
             { 
@@ -270,7 +287,10 @@ const PLAN = [
                 chapterDesc: "Cuentas nacionales, medición del PIB, inflación, desempleo y balanza de pagos.",
                 objective: "Entender las identidades contables fundamentales de una economía.",
                 time: "3h",
-                tasks: ["PIB, Inflación y Desempleo", "Identidades Contables", "Balanza de Pagos"],
+                tasks: [
+                    { t: "PIB, Inflación y Desempleo", m: "1.5h" },
+                    { t: "Identidades Contables & Balanza de Pagos", m: "1.5h" }
+                ],
                 video: { label: "Macro Data (MRU)", url: "https://www.youtube.com/watch?v=d8uTB5qBntE" } 
             }
         ]
@@ -283,7 +303,11 @@ const PLAN = [
                 chapterDesc: "Derivadas parciales, gradiente, Hessiano, funciones cóncavas y convexas.",
                 objective: "Calcular derivadas parciales y evaluar curvatura de funciones económicas.",
                 time: "5h",
-                tasks: ["Derivadas Parciales", "Gradiente y Hessiano", "Convexidad y Concavidad"],
+                tasks: [
+                    { t: "Derivadas Parciales & Gradiente", m: "2h" },
+                    { t: "Matriz Hessiana", m: "1.5h" },
+                    { t: "Convexidad y Concavidad", m: "1.5h" }
+                ],
                 video: { label: "Khan: Multivariable", url: "https://www.youtube.com/watch?v=TrcCjyW7xVI" } 
             },
             { 
@@ -291,7 +315,10 @@ const PLAN = [
                 chapterDesc: "Modelo de regresión simple, derivación de MCO, R-cuadrado y valores esperados.",
                 objective: "Derivar algebraicamente los estimadores Beta 0 y Beta 1.",
                 time: "5h",
-                tasks: ["Derivar estimadores B0 y B1", "R-cuadrado", "Supuestos Gauss-Markov (Intro)"],
+                tasks: [
+                    { t: "Derivar estimadores B0 y B1", m: "2.5h" },
+                    { t: "R-cuadrado & Supuestos GM", m: "2.5h" }
+                ],
                 video: { label: "Ben Lambert: OLS Derivation", url: "https://www.youtube.com/watch?v=b4YlQ912kIs" } 
             },
             { 
@@ -299,7 +326,10 @@ const PLAN = [
                 chapterDesc: "Efectos ingreso y sustitución, ecuación de Slutsky, relaciones de demanda.",
                 objective: "Descomponer cambios de precios en efectos ingreso y sustitución.",
                 time: "4h",
-                tasks: ["Demanda Marshaliana vs Hicksiana", "Ecuación de Slutsky (Efecto Ingreso/Sustitución)"],
+                tasks: [
+                    { t: "Demanda Marshaliana vs Hicksiana", m: "2h" },
+                    { t: "Ecuación de Slutsky (Efecto Ingreso/Sustitución)", m: "2h" }
+                ],
                 video: { label: "Slutsky Equation", url: "https://www.youtube.com/watch?v=ZUpYvD1O7cI" } 
             },
             { 
@@ -307,7 +337,11 @@ const PLAN = [
                 chapterDesc: "Modelo neoclásico de crecimiento, acumulación de capital y estado estacionario.",
                 objective: "Resolver el estado estacionario del modelo de Solow-Swan.",
                 time: "4h",
-                tasks: ["Acumulación de Capital", "Estado Estacionario", "Regla de Oro"],
+                tasks: [
+                    { t: "Acumulación de Capital", m: "1.5h" },
+                    { t: "Estado Estacionario", m: "1.5h" },
+                    { t: "Regla de Oro", m: "1h" }
+                ],
                 video: { label: "Marginal Rev: Solow", url: "https://www.youtube.com/watch?v=3nK29971D50" } 
             }
         ]
@@ -320,7 +354,11 @@ const PLAN = [
                 chapterDesc: "Multiplicadores de Lagrange, condiciones de primer y segundo orden.",
                 objective: "Resolver problemas de optimización con restricciones de igualdad (Lagrange).",
                 time: "5h",
-                tasks: ["Multiplicadores de Lagrange", "Interpretación Económica de Lambda", "Condiciones de 2do Orden"],
+                tasks: [
+                    { t: "Multiplicadores de Lagrange", m: "2h" },
+                    { t: "Interpretación Económica de Lambda", m: "1.5h" },
+                    { t: "Condiciones de 2do Orden", m: "1.5h" }
+                ],
                 video: { label: "Lagrange Multipliers", url: "https://www.youtube.com/watch?v=hQ4UNu1P2kw" } 
             },
             { 
@@ -328,7 +366,11 @@ const PLAN = [
                 chapterDesc: "Mecánica de MCO con k regresores, sesgo por variable omitida y varianza.",
                 objective: "Entender el sesgo generado por omitir variables relevantes.",
                 time: "5h",
-                tasks: ["Interpretación Ceteris Paribus", "Sesgo por Variable Omitida", "Multicolinealidad"],
+                tasks: [
+                    { t: "Interpretación Ceteris Paribus", m: "1.5h" },
+                    { t: "Sesgo por Variable Omitida", m: "2h" },
+                    { t: "Multicolinealidad", m: "1.5h" }
+                ],
                 video: { label: "Omitted Variable Bias", url: "https://www.youtube.com/watch?v=6J_q9C-Vqos" } 
             },
             { 
@@ -336,7 +378,11 @@ const PLAN = [
                 chapterDesc: "Funciones de producción, minimización de costos y maximización de beneficios.",
                 objective: "Derivar funciones de costos (marginal y medio) desde la producción.",
                 time: "4h",
-                tasks: ["Minimización de Costos", "Funciones de Costo (Cmg, Cme)", "Oferta de la firma"],
+                tasks: [
+                    { t: "Minimización de Costos", m: "1.5h" },
+                    { t: "Funciones de Costo (Cmg, Cme)", m: "1.5h" },
+                    { t: "Oferta de la firma", m: "1h" }
+                ],
                 video: { label: "Cost Functions", url: "https://www.youtube.com/watch?v=ucJBO9gkUoQ" } 
             },
             { 
@@ -344,7 +390,11 @@ const PLAN = [
                 chapterDesc: "Elección intertemporal, restricción presupuestaria dinámica y ecuación de Euler.",
                 objective: "Plantear y resolver la ecuación de Euler para el consumo.",
                 time: "4h",
-                tasks: ["Modelo de 2 periodos", "Restricción presupuestaria intertemporal", "Ecuación de Euler"],
+                tasks: [
+                    { t: "Modelo de 2 periodos", m: "1.5h" },
+                    { t: "Restricción presupuestaria intertemporal", m: "1h" },
+                    { t: "Ecuación de Euler", m: "1.5h" }
+                ],
                 video: { label: "Consumption Smoothing", url: "https://www.youtube.com/watch?v=Nu49gqg2q3k" } 
             }
         ]
@@ -357,7 +407,11 @@ const PLAN = [
                 chapterDesc: "Caja de Edgeworth, eficiencia de Pareto y teoremas del bienestar.",
                 objective: "Visualizar el intercambio y definir la eficiencia de Pareto.",
                 time: "4h",
-                tasks: ["Caja de Edgeworth", "Eficiencia de Pareto", "Teoremas del Bienestar"],
+                tasks: [
+                    { t: "Caja de Edgeworth", m: "1.5h" },
+                    { t: "Eficiencia de Pareto", m: "1h" },
+                    { t: "Teoremas del Bienestar", m: "1.5h" }
+                ],
                 video: { label: "BurkeyAcademy: Edgeworth", url: "https://www.youtube.com/watch?v=QfiYJFxY360" } 
             },
             { 
@@ -365,7 +419,11 @@ const PLAN = [
                 chapterDesc: "Distribuciones muestrales, pruebas t, valores p e intervalos de confianza.",
                 objective: "Realizar e interpretar pruebas de hipótesis sobre coeficientes.",
                 time: "5h",
-                tasks: ["Tests de Hipótesis (t-test)", "Intervalos de Confianza", "Significancia Económica vs Estadística"],
+                tasks: [
+                    { t: "Tests de Hipótesis (t-test)", m: "2h" },
+                    { t: "Intervalos de Confianza", m: "1.5h" },
+                    { t: "Significancia Económica vs Estadística", m: "1.5h" }
+                ],
                 video: { label: "Hypothesis Testing", url: "https://www.youtube.com/watch?v=Jjq9a3y8wUk" } 
             },
             { 
@@ -373,7 +431,10 @@ const PLAN = [
                 chapterDesc: "Programación no lineal con restricciones de desigualdad.",
                 objective: "Plantear condiciones de holgura complementaria.",
                 time: "4h",
-                tasks: ["Condiciones de Holgura", "Teorema de la Envolvente"],
+                tasks: [
+                    { t: "Condiciones de Holgura", m: "2h" },
+                    { t: "Teorema de la Envolvente", m: "2h" }
+                ],
                 video: { label: "Kuhn Tucker Intuition", url: "https://www.youtube.com/watch?v=J3yN-eWc-4M" } 
             },
              { 
@@ -381,7 +442,10 @@ const PLAN = [
                 chapterDesc: "Mercado de bienes, mercado monetario, equilibrio a corto plazo.",
                 objective: "Analizar política fiscal y monetaria en el corto plazo.",
                 time: "3h",
-                tasks: ["Mercado de Bienes (IS)", "Mercado Monetario (LM)", "Política Fiscal y Monetaria"],
+                tasks: [
+                    { t: "Mercado de Bienes (IS) & Monetario (LM)", m: "1.5h" },
+                    { t: "Política Fiscal y Monetaria", m: "1.5h" }
+                ],
                 video: { label: "IS-LM Model", url: "https://www.youtube.com/watch?v=7yK7q1H6i5E" } 
             }
         ]
@@ -394,7 +458,11 @@ const PLAN = [
                 chapterDesc: "Poder de mercado, ingreso marginal y tipos de discriminación de precios.",
                 objective: "Calcular la pérdida de peso muerto y beneficios del monopolista.",
                 time: "4h",
-                tasks: ["Maximización del Monopolista", "Discriminación de 1er, 2do y 3er grado", "Pérdida de Eficiencia"],
+                tasks: [
+                    { t: "Maximización del Monopolista", m: "1.5h" },
+                    { t: "Discriminación de 1er, 2do y 3er grado", m: "1.5h" },
+                    { t: "Pérdida de Eficiencia", m: "1h" }
+                ],
                 video: { label: "Price Discrimination", url: "https://www.youtube.com/watch?v=Rj3qf_c18Yg" } 
             },
             { 
@@ -402,7 +470,11 @@ const PLAN = [
                 chapterDesc: "Consistencia, convergencia en probabilidad y normalidad asintótica.",
                 objective: "Diferenciar entre insesgadez (muestras finitas) y consistencia (muestras grandes).",
                 time: "4h",
-                tasks: ["Consistencia vs Insesgadez", "Convergencia en Probabilidad", "Ley de Grandes Números"],
+                tasks: [
+                    { t: "Consistencia vs Insesgadez", m: "1.5h" },
+                    { t: "Convergencia en Probabilidad", m: "1.5h" },
+                    { t: "Ley de Grandes Números", m: "1h" }
+                ],
                 video: { label: "Consistency vs Unbiasedness", url: "https://www.youtube.com/watch?v=3RzG6n4MWvw" } 
             },
             { 
@@ -410,7 +482,11 @@ const PLAN = [
                 chapterDesc: "Modelo OA-DA dinámico, expectativas racionales y curva de Phillips.",
                 objective: "Entender cómo las expectativas afectan el equilibrio macro.",
                 time: "4h",
-                tasks: ["Curva de Phillips", "Expectativas Racionales", "Shock de Oferta"],
+                tasks: [
+                    { t: "Curva de Phillips", m: "1.5h" },
+                    { t: "Expectativas Racionales", m: "1.5h" },
+                    { t: "Shock de Oferta", m: "1h" }
+                ],
                 video: { label: "AS-AD Model", url: "https://www.youtube.com/watch?v=5lZqX2_XQ34" } 
             },
             { 
@@ -418,7 +494,11 @@ const PLAN = [
                 chapterDesc: "Ecuaciones diferenciales lineales de primer orden y estabilidad.",
                 objective: "Analizar la estabilidad de un sistema dinámico usando diagramas de fase.",
                 time: "3h",
-                tasks: ["EDO de primer orden", "Diagramas de Fase", "Estabilidad del equilibrio"],
+                tasks: [
+                    { t: "EDO de primer orden", m: "1h" },
+                    { t: "Diagramas de Fase", m: "1h" },
+                    { t: "Estabilidad del equilibrio", m: "1h" }
+                ],
                 video: { label: "Phase Diagrams", url: "https://www.youtube.com/watch?v=P676451eF5M" } 
             }
         ]
@@ -431,7 +511,11 @@ const PLAN = [
                 chapterDesc: "Ineficiencia del mercado, soluciones privadas (Coase) y públicas (Pigou).",
                 objective: "Modelar externalidades y calcular el impuesto Pigouviano óptimo.",
                 time: "4h",
-                tasks: ["Impuestos Pigouvianos", "Teorema de Coase", "Condición de Samuelson"],
+                tasks: [
+                    { t: "Impuestos Pigouvianos", m: "1.5h" },
+                    { t: "Teorema de Coase", m: "1h" },
+                    { t: "Condición de Samuelson (B. Públicos)", m: "1.5h" }
+                ],
                 video: { label: "Public Goods", url: "https://www.youtube.com/watch?v=1_3A_r8a-1I" } 
             },
             { 
@@ -439,7 +523,11 @@ const PLAN = [
                 chapterDesc: "Varianza del error no constante, tests de detección y corrección.",
                 objective: "Detectar heterocedasticidad y aplicar errores estándar robustos.",
                 time: "4h",
-                tasks: ["Detección (Breusch-Pagan/White)", "Errores Estándar Robustos", "GLS (Mínimos Cuadrados Generalizados)"],
+                tasks: [
+                    { t: "Detección (Breusch-Pagan/White)", m: "2h" },
+                    { t: "Errores Estándar Robustos", m: "1h" },
+                    { t: "GLS (Mínimos Cuadrados Generalizados)", m: "1h" }
+                ],
                 video: { label: "Heteroskedasticity", url: "https://www.youtube.com/watch?v=3M232y_D948" } 
             },
             { 
@@ -447,7 +535,11 @@ const PLAN = [
                 chapterDesc: "Bancos centrales, objetivos de inflación y reglas de política.",
                 objective: "Analizar la regla de Taylor y el principio de Taylor.",
                 time: "3h",
-                tasks: ["Reglas de Taylor", "Inconsistencia Dinámica", "Banco Central Independiente"],
+                tasks: [
+                    { t: "Reglas de Taylor", m: "1h" },
+                    { t: "Inconsistencia Dinámica", m: "1h" },
+                    { t: "Banco Central Independiente", m: "1h" }
+                ],
                 video: { label: "Taylor Rule", url: "https://www.youtube.com/watch?v=y3qT1_y8y5w" } 
             }
         ]
@@ -460,7 +552,11 @@ const PLAN = [
                 chapterDesc: "Juegos en forma normal, estrategias puras y mixtas.",
                 objective: "Encontrar el Equilibrio de Nash en juegos simultáneos.",
                 time: "4h",
-                tasks: ["Equilibrio de Nash", "Estrategias Dominantes", "Dilema del Prisionero"],
+                tasks: [
+                    { t: "Equilibrio de Nash", m: "2h" },
+                    { t: "Estrategias Dominantes", m: "1h" },
+                    { t: "Dilema del Prisionero", m: "1h" }
+                ],
                 video: { label: "Game Theory 101", url: "https://www.youtube.com/watch?v=M8C2d5VvKFE" } 
             },
             { 
@@ -468,7 +564,11 @@ const PLAN = [
                 chapterDesc: "Datos de series temporales, estacionariedad y tendencias.",
                 objective: "Diferenciar entre procesos estacionarios y no estacionarios.",
                 time: "4h",
-                tasks: ["Modelos Estáticos vs Dinámicos", "Tendencia y Estacionalidad", "Supuestos TS"],
+                tasks: [
+                    { t: "Modelos Estáticos vs Dinámicos", m: "1.5h" },
+                    { t: "Tendencia y Estacionalidad", m: "1.5h" },
+                    { t: "Supuestos TS", m: "1h" }
+                ],
                 video: { label: "Time Series Intro", url: "https://www.youtube.com/watch?v=Y2k6N5yL-n0" } 
             },
             { 
@@ -476,7 +576,11 @@ const PLAN = [
                 chapterDesc: "Modelos AK, externalidades del capital e innovación.",
                 objective: "Contrastar crecimiento exógeno vs endógeno.",
                 time: "3h",
-                tasks: ["Modelos AK", "Capital Humano", "Innovación y R&D"],
+                tasks: [
+                    { t: "Modelos AK", m: "1h" },
+                    { t: "Capital Humano", m: "1h" },
+                    { t: "Innovación y R&D", m: "1h" }
+                ],
                 video: { label: "Endogenous Growth", url: "https://www.youtube.com/watch?v=sc1-Noyk-jM" } 
             }
         ]
@@ -484,10 +588,10 @@ const PLAN = [
     {
         w: 8, title: "Repaso & Simulación Exámenes",
         topics: [
-            { area: "math", title: "Repaso Final Matemáticas", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null },
-            { area: "micro", title: "Repaso Final Micro", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null },
-            { area: "metrics", title: "Repaso Final Econometría", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null },
-            { area: "macro", title: "Repaso Final Macro", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: ["Resolver Examen Año Anterior"], video: null }
+            { area: "math", title: "Repaso Final Matemáticas", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: [{t:"Resolver Examen Año Anterior", m:"4h"}], video: null },
+            { area: "micro", title: "Repaso Final Micro", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: [{t:"Resolver Examen Año Anterior", m:"4h"}], video: null },
+            { area: "metrics", title: "Repaso Final Econometría", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: [{t:"Resolver Examen Año Anterior", m:"4h"}], video: null },
+            { area: "macro", title: "Repaso Final Macro", book: "Cuadernos", chapterDesc:"Revisión integral.", objective:"Simulación de examen.", time:"4h", tasks: [{t:"Resolver Examen Año Anterior", m:"4h"}], video: null }
         ]
     }
 ];
@@ -685,8 +789,11 @@ function render() {
                 const checked = state.checks[uid] ? "checked" : "";
                 tasksHtml += `
                     <label class="task-item">
-                        <input type="checkbox" id="${uid}" ${checked} onchange="toggleCheck('${uid}')">
-                        <span>${task}</span>
+                        <div class="task-left">
+                            <input type="checkbox" id="${uid}" ${checked} onchange="toggleCheck('${uid}')">
+                            <span>${task.t}</span>
+                        </div>
+                        <span class="task-time-badge">${task.m}</span>
                     </label>
                 `;
             });
@@ -772,3 +879,4 @@ init();
 </script>
 </body>
 </html>
+
