@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Tracker Estadística (Magíster Economía)</title>
+<style>
+    :root {
+        --bg: #0b0f14; --card: #161b22; --card-hover: #1c2128;
+        --muted: #8b949e; --text: #c9d1d9; --line: #30363d;
+        --accent: #58a6ff; --ok: #3fb950; --warn: #d29922; --bad: #f85149;
+        --highlight: rgba(210, 153, 34, 0.15);
+        --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); margin: 0; padding: 20px; box-sizing: border-box; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    
+    /* Headers & Text */
+    h1 { margin: 0 0 10px 0; font-size: 22px; color: #fff; }
+    .sub { color: var(--muted); margin-bottom: 20px; line-height: 1.5; font-size: 14px; }
+    .mono { font-family: var(--mono); }
+    
+    /* Grid System */
+    .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    
+    /* Cards */
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px; transition: border-color 0.2s; }
+    .card:hover { border-color: var(--muted); }
+    .card-title { font-weight: 600; color: #fff; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    
+    /* KPIs */
+    .kpi-row { display: flex; gap: 20px; align-items: baseline; margin-top: 8px; }
+    .kpi-val { font-family: var(--mono); font-size: 28px; font-weight: 700; color: #fff; }
+    .kpi-lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    /* Progress Bars */
+    .progress-container { background: #21262d; height: 12px; border-radius: 6px; overflow: hidden; margin: 10px 0; position: relative; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--ok)); width: 0%; transition: width 0.5s ease; }
+    .progress-text { position: absolute; right: 6px; top: -1px; font-size: 10px; color: #fff; font-weight: bold; line-height: 12px; text-shadow: 0 0 4px #000; }
+
+    /* Controls */
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    button, input[type="date"] { background: #21262d; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 12px; }
+    button:hover, input[type="date"]:hover { background: #30363d; border-color: var(--muted); }
+    button.danger { color: var(--bad); border-color: rgba(248, 81, 73, 0.4); }
+    
+    /* Table */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--card); }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); background: #161b22; color: var(--muted); font-size: 12px; text-transform: uppercase; }
+    td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14px; }
+    tr:last-child td { border-bottom: none; }
+    tr.current-week { background: var(--highlight); position: relative; }
+    tr.current-week::after { content: "SEMANA ACTUAL"; position: absolute; right: 10px; top: 10px; font-size: 9px; background: var(--warn); color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+    
+    /* Specific Column Styles */
+    .col-week { width: 140px; }
+    .col-book { width: 200px; }
+    
+    /* Tags & Lists */
+    ul { padding-left: 20px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    li { margin-bottom: 4px; }
+    .tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 12px; border: 1px solid var(--line); font-weight: 600; margin-top: 6px; }
+    .tag.exam { border-color: var(--warn); color: var(--warn); background: rgba(210, 153, 34, 0.1); }
+    .tag.deliver { border-color: var(--ok); color: var(--ok); background: rgba(63, 185, 80, 0.1); }
+    .tag.buffer { border-color: var(--bad); color: var(--bad); background: rgba(248, 81, 73, 0.1); }
+    
+    /* Checkbox Grid */
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .chk-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; background: #0d1117; padding: 6px; border-radius: 4px; border: 1px solid var(--line); cursor: pointer; transition: background 0.2s; }
+    .chk-item:hover { background: #161b22; }
+    .chk-item input { margin-top: 3px; accent-color: var(--ok); cursor: pointer; }
+    .chk-meta { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+    .chk-title { font-weight: 600; color: var(--text); }
+    
+    /* Sticky Header Logic */
+    .sticky-top { position: sticky; top: 0; z-index: 100; background: var(--bg); padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+    
+    <div class="sticky-top">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <div>
+                <h1>Base Sólida: Estadística & Econometría</h1>
+                <div class="sub" style="margin-bottom:0;">
+                    Ruta para Magíster en Economía · <span id="weeksCountDisplay">0</span> semanas ·
+                    Inicio: <input type="date" id="startDatePicker">
+                </div>
+            </div>
+            <div style="text-align:right;">
+                <div class="kpi-val" id="globalPercent">0%</div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-fill" id="globalFill"></div>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="card">
+            <div class="card-title">Progreso</div>
+            <div class="kpi-row">
+                <div><div class="kpi-val" id="doneCount">0</div><div class="kpi-lbl">Completados</div></div>
+                <div><div class="kpi-val" id="totalCount">0</div><div class="kpi-lbl">Totales</div></div>
+            </div>
+            <div class="controls">
+                <button id="btnExport">💾 Guardar (JSON)</button>
+                <button id="btnImport">📂 Cargar</button>
+                <button id="btnReset" class="danger">Reset</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Reglas de Juego</div>
+            <ul style="color:var(--text);">
+                <li><strong style="color:var(--accent)">Output > Input:</strong> No solo leas. Resume, resuelve y explica.</li>
+                <li><strong style="color:var(--warn)">Regla del 70%:</strong> En los mini-exámenes, menos de 70% significa repetir la semana (Buffer).</li>
+                <li><strong style="color:var(--ok)">Coding:</strong> Todo concepto abstracto debe ser simulado en Python/R.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table id="planTable">
+            <thead>
+                <tr>
+                    <th class="col-week">Semana / Fechas</th>
+                    <th class="col-book">Foco & Recursos</th>
+                    <th>Resultados de Aprendizaje (Outcomes)</th>
+                    <th style="min-width:300px;">Sesiones & Checklist</th>
+                </tr>
+            </thead>
+            <tbody id="planBody"></tbody>
+        </table>
+    </div>
+
+    <div class="sub" style="margin-top: 40px; text-align: center;">
+        Inspirado en los currículums de top-tier Economics PhDs (MIT, LSE) pero adaptado para auto-estudio.
+        <br>Libros base: Strang (Lineal), Simon & Blume (Math Econ), Ross (Prob), Casella & Berger (Inferencia).
+    </div>
+
+</div>
+
+<script>
+/* CONFIGURACIÓN Y DATOS */
+const STORAGE_KEY = "econ_stats_tracker_v2";
+const DEFAULT_START = "2026-02-09";
+
+// Plantilla de sesiones semanales
+const WEEKLY_SESSIONS = [
+    {key:"mon", title:"Lun: Teoría", meta:"1h15 · Lectura activa"},
+    {key:"tue", title:"Mar: Ejercicios", meta:"1h15 · Mecánica"},
+    {key:"wed", title:"Mié: Derivación", meta:"1h15 · Profundidad"},
+    {key:"thu", title:"Jue: Hard Probs", meta:"1h15 · Sin mirar"},
+    {key:"sat", title:"Sáb: Lab (R/Py)", meta:"2h00 · Simulación"},
+    {key:"sun", title:"Dom: Test/Repaso", meta:"2h00 · Evaluación"}
+];
+
+/* PLAN DE ESTUDIOS (DATA) */
+const PLAN = [
+    // --- FASE 1: ÁLGEBRA LINEAL ---
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.1-2", topics: ["Vectores y Espacios", "Combinaciones Lineales", "Producto Punto"], outcomes: ["Entender la geometría vectorial", "Resolver Ax=b via eliminación"] },
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.2", topics: ["Matrices e Inversas", "Factorización LU", "Transpuestas"], outcomes: ["Calcular LU a mano", "Entender cuándo A es singular"] },
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.3", topics: ["Espacios Vectoriales", "Nullspace & Columnspace", "Rango"], outcomes: ["Relacionar Rango con soluciones", "Base y Dimensión"] },
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.3-4", topics: ["Ortogonalidad", "Proyecciones", "Gram-Schmidt"], outcomes: ["Proyección como la 'mejor aprox'", "Bases ortonormales"], milestone: {type:"exam", label:"Mini-Examen #1 (L1-L4)"} },
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.4", topics: ["Mínimos Cuadrados (OLS)", "Matriz de Proyección", "Regresión"], outcomes: ["Derivar beta OLS matricialmente", "Interpretar error e"], milestone: {type:"deliver", label:"NB: OLS desde cero"} },
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.5", topics: ["Determinantes", "Cofactores", "Regla de Cramer"], outcomes: ["Intuición de volumen", "Propiedades clave det(A)"] },
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.6", topics: ["Eigenvalues & Eigenvectors", "Diagonalización"], outcomes: ["Ec. Característica", "Potencias de matrices A^k"], milestone: {type:"exam", label:"Mini-Examen #2 (L5-L7)"} },
+    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.6+", topics: ["Matrices Simétricas Pos. Def.", "SVD (Intro)"], outcomes: ["Descomposición espectral", "PCA intuición"] },
+
+    // --- FASE 2: CÁLCULO ---
+    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Cálculo 1 var", "Elasticidades", "Series Taylor"], outcomes: ["Aproximación local", "Log-linealización"] },
+    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Multivariable", "Gradiente & Hessiano", "Convexidad"], outcomes: ["Matriz Hessiana y curvatura", "Concavidad estricta"] },
+    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Opt. Sin Restricciones", "FOC y SOC"], outcomes: ["Max vs Min local/global", "Puntos silla"], milestone: {type:"exam", label:"Mini-Examen #3 (Cálculo)"} },
+    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Opt. con Restricciones (Igualdad)", "Lagrange"], outcomes: ["Interpretar Multiplicador (Lambda)", "Lagrangiano"] },
+    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Restricciones Desigualdad", "Kuhn-Tucker (Intro)"], outcomes: ["Condiciones de holgura", "Teorema de la Envolvente"] },
+    { phase: "BUFFER / REPASO", book: "Repaso General", topics: ["Semana de ajuste", "Rehacer fallos"], outcomes: ["Cerrar brechas Fase 1 y 2"], milestone: {type:"buffer", label:"Semana Buffer"} },
+
+    // --- FASE 3: PROBABILIDAD ---
+    { phase: "PROBABILIDAD", book: "Ross Cap.1-2", topics: ["Axiomas", "Combinatoria", "Prob. Condicional"], outcomes: ["Teorema de Bayes", "Independencia"] },
+    { phase: "PROBABILIDAD", book: "Ross Cap.3", topics: ["Vars Aleatorias Discretas", "Bernoulli, Binomial, Poisson"], outcomes: ["PMF y CDF", "Valor Esperado E[X]"] },
+    { phase: "PROBABILIDAD", book: "Ross Cap.4", topics: ["Vars Continuas", "Uniforme, Normal, Exp"], outcomes: ["Densidad PDF vs CDF", "Propiedades de la Normal"] },
+    { phase: "PROBABILIDAD", book: "Ross Cap.5", topics: ["Distribuciones Conjuntas", "Marginales"], outcomes: ["Integral doble", "Independencia v.a."] },
+    { phase: "PROBABILIDAD", book: "Ross Cap.6-7", topics: ["Esperanza, Covarianza", "Correlación", "Momentos"], outcomes: ["Var(X+Y)", "Desigualdad Chebyshev"], milestone: {type:"exam", label:"Mini-Examen #4 (Prob)"} },
+    { phase: "PROBABILIDAD", book: "Ross Cap.8", topics: ["Teoremas Límite", "LLN (Ley Grandes Números)", "CLT"], outcomes: ["Convergencia en prob vs dist", "Simular CLT en Python"], milestone: {type:"deliver", label:"NB: Simulación CLT"} },
+
+    // --- FASE 4: INFERENCIA ---
+    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Estimación Puntual", "Sesgo y Varianza", "MSE"], outcomes: ["Bias-Variance Tradeoff", "Consistencia"] },
+    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Máxima Verosimilitud (MLE)", "Propiedades MLE"], outcomes: ["Derivar MLE normal/poisson", "Invarianza"] },
+    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Intervalos de Confianza", "Método Pivote"], outcomes: ["Interpretación frecuentista", "Construcción IC"] },
+    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Test de Hipótesis", "Lema Neyman-Pearson"], outcomes: ["Error Tipo I y II", "Potencia del test"], milestone: {type:"exam", label:"EXAMEN FINAL"} }
+];
+
+/* LÓGICA DE LA APP */
+let state = {};
+
+function init() {
+    // 1. Cargar estado
+    loadState();
+    
+    // 2. Configurar fecha
+    const dateInput = document.getElementById("startDatePicker");
+    if(!state.config) state.config = { startDate: DEFAULT_START };
+    dateInput.value = state.config.startDate;
+    
+    dateInput.addEventListener("change", (e) => {
+        state.config.startDate = e.target.value;
+        saveState();
+        render();
+    });
+
+    // 3. Botones
+    document.getElementById("btnExport").onclick = exportData;
+    document.getElementById("btnImport").onclick = importData;
+    document.getElementById("btnReset").onclick = resetData;
+
+    // 4. Render inicial
+    render();
+}
+
+function getWeekDateRange(startDateStr, weekIndex) {
+    const start = new Date(startDateStr + "T00:00:00"); // Fix timezone issue roughly
+    start.setDate(start.getDate() + (weekIndex * 7));
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    return { start, end };
+}
+
+function formatDate(date) {
+    return date.toLocaleDateString("es-CL", { day: "2-digit", month: "short" });
+}
+
+function isCurrentWeek(start, end) {
+    const now = new Date();
+    // Reset hours to compare dates strictly
+    now.setHours(0,0,0,0);
+    const s = new Date(start); s.setHours(0,0,0,0);
+    const e = new Date(end); e.setHours(23,59,59,999);
+    return now >= s && now <= e;
+}
+
+function render() {
+    const tbody = document.getElementById("planBody");
+    tbody.innerHTML = "";
+    
+    const startDate = state.config.startDate;
+    let totalChecks = 0;
+    let doneChecks = 0;
+
+    document.getElementById("weeksCountDisplay").textContent = PLAN.length;
+
+    PLAN.forEach((item, idx) => {
+        const weekNum = idx + 1;
+        const { start, end } = getWeekDateRange(startDate, idx);
+        const isCurrent = isCurrentWeek(start, end);
+        
+        const tr = document.createElement("tr");
+        if(isCurrent) tr.classList.add("current-week");
+
+        // COL 1: SEMANA
+        const td1 = document.createElement("td");
+        td1.innerHTML = `
+            <div class="mono" style="font-size:16px; font-weight:bold; color:#fff;">W${weekNum}</div>
+            <div class="sub" style="font-size:11px; margin-bottom:4px;">${formatDate(start)} - ${formatDate(end)}</div>
+            <div class="tag" style="background:rgba(255,255,255,0.05); color:#fff;">${item.phase}</div>
+        `;
+        tr.appendChild(td1);
+
+        // COL 2: LIBRO
+        const td2 = document.createElement("td");
+        let tagsHtml = item.topics.map(t => `<div class="tag">${t}</div>`).join(" ");
+        if(item.milestone) {
+            let cls = item.milestone.type === "exam" ? "exam" : (item.milestone.type === "buffer" ? "buffer" : "deliver");
+            tagsHtml += `<br><div class="tag ${cls}" style="margin-top:8px;">★ ${item.milestone.label}</div>`;
+        }
+        td2.innerHTML = `
+            <div style="font-weight:600; color:#fff; margin-bottom:4px;">${item.book}</div>
+            ${tagsHtml}
+        `;
+        tr.appendChild(td2);
+
+        // COL 3: OUTCOMES
+        const td3 = document.createElement("td");
+        td3.innerHTML = `<ul>${item.outcomes.map(o => `<li>${o}</li>`).join("")}</ul>`;
+        tr.appendChild(td3);
+
+        // COL 4: CHECKLIST
+        const td4 = document.createElement("td");
+        const grid = document.createElement("div");
+        grid.className = "check-grid";
+
+        // Generar checks normales
+        WEEKLY_SESSIONS.forEach(sess => {
+            const cid = `w${weekNum}_${sess.key}`;
+            const isChecked = state[cid] === 1;
+            totalChecks++;
+            if(isChecked) doneChecks++;
+
+            const div = document.createElement("label");
+            div.className = "chk-item";
+            div.innerHTML = `
+                <input type="checkbox" data-id="${cid}" ${isChecked ? "checked" : ""}>
+                <div>
+                    <span class="chk-title">${sess.title}</span>
+                    <span class="chk-meta">${sess.meta}</span>
+                </div>
+            `;
+            // Evento cambio
+            div.querySelector("input").addEventListener("change", (e) => {
+                state[cid] = e.target.checked ? 1 : 0;
+                saveState();
+                render(); // Re-render para actualizar KPI
+            });
+            grid.appendChild(div);
+        });
+
+        // Generar check de milestone si existe
+        if(item.milestone) {
+            const mid = `w${weekNum}_milestone`;
+            const isChecked = state[mid] === 1;
+            totalChecks++;
+            if(isChecked) doneChecks++;
+
+            const div = document.createElement("label");
+            div.className = "chk-item";
+            div.style.gridColumn = "span 2";
+            div.style.borderColor = item.milestone.type === "buffer" ? "var(--bad)" : "var(--warn)";
+            div.innerHTML = `
+                <input type="checkbox" data-id="${mid}" ${isChecked ? "checked" : ""}>
+                <div>
+                    <span class="chk-title" style="color:${item.milestone.type === "buffer" ? "var(--bad)" : "var(--warn)"}">${item.milestone.label}</span>
+                    <span class="chk-meta">Hito Obligatorio</span>
+                </div>
+            `;
+            div.querySelector("input").addEventListener("change", (e) => {
+                state[mid] = e.target.checked ? 1 : 0;
+                saveState();
+                render();
+            });
+            grid.appendChild(div);
+        }
+
+        td4.appendChild(grid);
+        tr.appendChild(td4);
+        tbody.appendChild(tr);
+    });
+
+    // Actualizar KPIs Globales
+    const pct = totalChecks === 0 ? 0 : Math.round((doneChecks / totalChecks) * 100);
+    document.getElementById("doneCount").textContent = doneChecks;
+    document.getElementById("totalCount").textContent = totalChecks;
+    document.getElementById("globalPercent").textContent = pct + "%";
+    document.getElementById("globalFill").style.width = pct + "%";
+}
+
+/* PERSISTENCIA */
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        state = raw ? JSON.parse(raw) : {};
+    } catch (e) { console.error("Error loading state", e); state = {}; }
+}
+
+function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function exportData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "progreso_estudio.json");
+    dlAnchorElem.click();
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = readerEvent => {
+            try {
+                state = JSON.parse(readerEvent.target.result);
+                saveState();
+                init(); // Reiniciar con nueva data
+                alert("Progreso cargado exitosamente.");
+            } catch(err) { alert("Error al leer archivo JSON"); }
+        }
+    }
+    input.click();
+}
+
+function resetData() {
+    if(confirm("¿Seguro que quieres borrar todo el progreso?")) {
+        state = { config: { startDate: DEFAULT_START } };
+        saveState();
+        render();
+    }
+}
+
+// Iniciar app
+init();
+
+</script>
+</body>
+</html>
