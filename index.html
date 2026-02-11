@@ -3,409 +3,342 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Tracker Estadística (Magíster Economía)</title>
+<title>Nivelación MAE - Universidad de Chile</title>
 <style>
     :root {
-        --bg: #0b0f14; --card: #161b22; --card-hover: #1c2128;
-        --muted: #8b949e; --text: #c9d1d9; --line: #30363d;
-        --accent: #58a6ff; --ok: #3fb950; --warn: #d29922; --bad: #f85149;
-        --highlight: rgba(210, 153, 34, 0.15);
-        --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        --bg: #0d1117; --card: #161b22; --border: #30363d;
+        --text: #c9d1d9; --accent: #58a6ff; 
+        --math: #7ee787; /* Verde para mate */
+        --micro: #f0883e; /* Naranja para micro */
+        --macro: #d2a8ff; /* Morado para macro */
+        --metrics: #79c0ff; /* Azul para econometría */
+        --font-sans: system-ui, -apple-system, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, monospace;
     }
-    body { background: var(--bg); color: var(--text); font-family: var(--sans); margin: 0; padding: 20px; box-sizing: border-box; }
-    .wrap { max-width: 1200px; margin: 0 auto; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); margin: 0; padding: 20px; }
+    .wrap { max-width: 1400px; margin: 0 auto; }
     
-    /* Headers & Text */
-    h1 { margin: 0 0 10px 0; font-size: 22px; color: #fff; }
-    .sub { color: var(--muted); margin-bottom: 20px; line-height: 1.5; font-size: 14px; }
-    .mono { font-family: var(--mono); }
+    /* Header Styles */
+    header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
+    h1 { margin: 0; font-size: 1.8rem; color: #fff; }
+    .subtitle { color: #8b949e; margin-top: 5px; font-size: 0.95rem; }
     
-    /* Grid System */
-    .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    
-    /* Cards */
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px; transition: border-color 0.2s; }
-    .card:hover { border-color: var(--muted); }
-    .card-title { font-weight: 600; color: #fff; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-    
-    /* KPIs */
-    .kpi-row { display: flex; gap: 20px; align-items: baseline; margin-top: 8px; }
-    .kpi-val { font-family: var(--mono); font-size: 28px; font-weight: 700; color: #fff; }
-    .kpi-lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    /* Progress Bars */
-    .progress-container { background: #21262d; height: 12px; border-radius: 6px; overflow: hidden; margin: 10px 0; position: relative; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--ok)); width: 0%; transition: width 0.5s ease; }
-    .progress-text { position: absolute; right: 6px; top: -1px; font-size: 10px; color: #fff; font-weight: bold; line-height: 12px; text-shadow: 0 0 4px #000; }
+    /* Grid Layout */
+    .grid-container { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+    @media (max-width: 900px) { .grid-container { grid-template-columns: 1fr; } }
 
-    /* Controls */
-    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-    button, input[type="date"] { background: #21262d; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 12px; }
-    button:hover, input[type="date"]:hover { background: #30363d; border-color: var(--muted); }
-    button.danger { color: var(--bad); border-color: rgba(248, 81, 73, 0.4); }
+    /* Sidebar / Resources */
+    .sidebar { display: flex; flex-direction: column; gap: 15px; }
+    .resource-card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 15px; }
+    .res-title { font-weight: bold; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .link-list a { display: block; padding: 6px 0; color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+    .link-list a:hover { text-decoration: underline; }
     
-    /* Table */
-    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--card); }
+    /* Main Planner Table */
+    .planner-card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .controls { padding: 15px; background: #21262d; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    
     table { width: 100%; border-collapse: collapse; min-width: 800px; }
-    th { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); background: #161b22; color: var(--muted); font-size: 12px; text-transform: uppercase; }
-    td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14px; }
-    tr:last-child td { border-bottom: none; }
-    tr.current-week { background: var(--highlight); position: relative; }
-    tr.current-week::after { content: "SEMANA ACTUAL"; position: absolute; right: 10px; top: 10px; font-size: 9px; background: var(--warn); color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+    th { text-align: left; padding: 12px 15px; background: #0d1117; color: #8b949e; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 15px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 0.9rem; }
+    tr:hover { background: rgba(255,255,255,0.02); }
+
+    /* Badges & Tags */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; border: 1px solid transparent; }
+    .b-math { color: #000; background: var(--math); border-color: var(--math); }
+    .b-micro { color: #000; background: var(--micro); border-color: var(--micro); }
+    .b-macro { color: #000; background: var(--macro); border-color: var(--macro); }
+    .b-metrics { color: #000; background: var(--metrics); border-color: var(--metrics); }
     
-    /* Specific Column Styles */
-    .col-week { width: 140px; }
-    .col-book { width: 200px; }
-    
-    /* Tags & Lists */
-    ul { padding-left: 20px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
-    li { margin-bottom: 4px; }
-    .tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 12px; border: 1px solid var(--line); font-weight: 600; margin-top: 6px; }
-    .tag.exam { border-color: var(--warn); color: var(--warn); background: rgba(210, 153, 34, 0.1); }
-    .tag.deliver { border-color: var(--ok); color: var(--ok); background: rgba(63, 185, 80, 0.1); }
-    .tag.buffer { border-color: var(--bad); color: var(--bad); background: rgba(248, 81, 73, 0.1); }
-    
-    /* Checkbox Grid */
-    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .chk-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; background: #0d1117; padding: 6px; border-radius: 4px; border: 1px solid var(--line); cursor: pointer; transition: background 0.2s; }
-    .chk-item:hover { background: #161b22; }
-    .chk-item input { margin-top: 3px; accent-color: var(--ok); cursor: pointer; }
-    .chk-meta { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
-    .chk-title { font-weight: 600; color: var(--text); }
-    
-    /* Sticky Header Logic */
-    .sticky-top { position: sticky; top: 0; z-index: 100; background: var(--bg); padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+    .book-ref { font-family: var(--font-mono); font-size: 0.8rem; color: #8b949e; margin-top: 4px; display: block; }
+    .outcome-list { margin: 0; padding-left: 20px; color: #c9d1d9; }
+    .outcome-list li { margin-bottom: 4px; }
+
+    /* Progress Bar */
+    .progress-wrap { flex-grow: 1; max-width: 300px; margin-right: 20px; }
+    .progress-bar { height: 8px; background: #30363d; border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+    .progress-text { font-size: 0.8rem; color: #8b949e; text-align: right; margin-top: 4px; }
+
+    /* Checkbox styling */
+    .check-container { display: block; position: relative; padding-left: 30px; margin-bottom: 8px; cursor: pointer; user-select: none; }
+    .check-container input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+    .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #21262d; border: 1px solid var(--border); border-radius: 4px; }
+    .check-container:hover input ~ .checkmark { background-color: #30363d; }
+    .check-container input:checked ~ .checkmark { background-color: var(--accent); border-color: var(--accent); }
+    .checkmark:after { content: ""; position: absolute; display: none; }
+    .check-container input:checked ~ .checkmark:after { display: block; }
+    .check-container .checkmark:after { left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
 </style>
 </head>
 <body>
 
 <div class="wrap">
-    
-    <div class="sticky-top">
-        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-            <div>
-                <h1>Base Sólida: Estadística & Econometría</h1>
-                <div class="sub" style="margin-bottom:0;">
-                    Ruta para Magíster en Economía · <span id="weeksCountDisplay">0</span> semanas ·
-                    Inicio: <input type="date" id="startDatePicker">
+    <header>
+        <h1>Nivelación Magíster Análisis Económico (FEN)</h1>
+        <div class="subtitle">Planner Intensivo de 8 Semanas · Basado en bibliografía estándar UChile</div>
+    </header>
+
+    <div class="grid-container">
+        <div class="sidebar">
+            <div class="resource-card" style="border-color: var(--math);">
+                <div class="res-title" style="color:var(--math)">📐 Matemáticas</div>
+                <div style="font-size:0.85rem; margin-bottom:10px;">
+                    <strong>Libro Base:</strong> Simon & Blume, <em>Mathematics for Economists</em>.<br>
+                    <span style="color:#8b949e">Alternativa: Chiang & Wainwright.</span>
+                </div>
+                <div class="link-list">
+                    <a href="https://ocw.mit.edu/courses/14-102-mathematics-for-economists-fall-2004/" target="_blank">MIT OCW: Math for Economists</a>
+                    <a href="https://www.khanacademy.org/math/multivariable-calculus" target="_blank">Khan Academy: Cálculo Multivariable</a>
                 </div>
             </div>
-            <div style="text-align:right;">
-                <div class="kpi-val" id="globalPercent">0%</div>
-            </div>
-        </div>
-        <div class="progress-container">
-            <div class="progress-fill" id="globalFill"></div>
-        </div>
-    </div>
 
-    <div class="dashboard">
-        <div class="card">
-            <div class="card-title">Progreso</div>
-            <div class="kpi-row">
-                <div><div class="kpi-val" id="doneCount">0</div><div class="kpi-lbl">Completados</div></div>
-                <div><div class="kpi-val" id="totalCount">0</div><div class="kpi-lbl">Totales</div></div>
+            <div class="resource-card" style="border-color: var(--micro);">
+                <div class="res-title" style="color:var(--micro)">🍎 Microeconomía</div>
+                <div style="font-size:0.85rem; margin-bottom:10px;">
+                    <strong>Libro Base:</strong> Nicholson & Snyder, <em>Microeconomic Theory</em>.<br>
+                    <span style="color:#8b949e">Enfoque: Equilibrio General, Bienestar y Fallas de Mercado.</span>
+                </div>
+                <div class="link-list">
+                    <a href="https://www.youtube.com/playlist?list=PLC8471298458D4D60" target="_blank">Curso Micro Avanzada (YouTube)</a>
+                    <a href="https://mru.org/" target="_blank">Marginal Revolution Univ (Conceptos)</a>
+                </div>
             </div>
+
+            <div class="resource-card" style="border-color: var(--metrics);">
+                <div class="res-title" style="color:var(--metrics)">📊 Estadística/Econometría</div>
+                <div style="font-size:0.85rem; margin-bottom:10px;">
+                    <strong>Libro Base:</strong> Wooldridge, <em>Introductory Econometrics</em>.<br>
+                    <span style="color:#8b949e">Clave: Modelo Lineal (OLS) y sus supuestos.</span>
+                </div>
+                <div class="link-list">
+                    <a href="https://www.youtube.com/c/BenLambert" target="_blank">Ben Lambert (Mejor canal de Econometría)</a>
+                    <a href="https://www.youtube.com/user/econometricsacademy" target="_blank">Econometrics Academy</a>
+                </div>
+            </div>
+
+            <div class="resource-card" style="border-color: var(--macro);">
+                <div class="res-title" style="color:var(--macro)">📈 Macroeconomía</div>
+                <div style="font-size:0.85rem; margin-bottom:10px;">
+                    <strong>Libro Base:</strong> De Gregorio, <em>Macroeconomía</em>.<br>
+                    <span style="color:#8b949e">Estándar FEN. Alternativa: Romer (Advanced Macro).</span>
+                </div>
+            </div>
+            
+             <div class="resource-card">
+                <div class="res-title">💾 Datos</div>
+                <div style="font-size:0.85rem; color:#8b949e;">
+                    Tu progreso se guarda automáticamente en este navegador.
+                </div>
+                 <button onclick="resetProgress()" style="margin-top:10px; background:#21262d; color:#f85149; border:1px solid #f85149; padding:5px 10px; border-radius:4px; cursor:pointer;">Resetear Todo</button>
+            </div>
+        </div>
+
+        <div class="planner-card">
             <div class="controls">
-                <button id="btnExport">💾 Guardar (JSON)</button>
-                <button id="btnImport">📂 Cargar</button>
-                <button id="btnReset" class="danger">Reset</button>
+                <div class="progress-wrap">
+                    <div class="progress-bar"><div class="progress-fill" id="globalFill"></div></div>
+                    <div class="progress-text">Progreso General: <span id="globalPct">0%</span></div>
+                </div>
+                <select id="weekFilter" style="background:#0d1117; color:#fff; padding:5px; border:1px solid #30363d; border-radius:4px;">
+                    <option value="all">Ver Todo el Programa</option>
+                    <option value="1">Semana 1</option>
+                    <option value="2">Semana 2</option>
+                    <option value="3">Semana 3</option>
+                    <option value="4">Semana 4</option>
+                    <option value="5">Semana 5</option>
+                    <option value="6">Semana 6</option>
+                    <option value="7">Semana 7</option>
+                    <option value="8">Semana 8</option>
+                </select>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <tbody id="planBody">
+                    </tbody>
+                <table id="planTable">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">Sem</th>
+                            <th style="width:120px;">Asignatura</th>
+                            <th>Tema & Lectura (Libro + Capítulos)</th>
+                            <th style="width:250px;">Checklist de Estudio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableContent"></tbody>
+                </table>
             </div>
         </div>
-
-        <div class="card">
-            <div class="card-title">Reglas de Juego</div>
-            <ul style="color:var(--text);">
-                <li><strong style="color:var(--accent)">Output > Input:</strong> No solo leas. Resume, resuelve y explica.</li>
-                <li><strong style="color:var(--warn)">Regla del 70%:</strong> En los mini-exámenes, menos de 70% significa repetir la semana (Buffer).</li>
-                <li><strong style="color:var(--ok)">Coding:</strong> Todo concepto abstracto debe ser simulado en Python/R.</li>
-            </ul>
-        </div>
     </div>
-
-    <div class="table-wrap">
-        <table id="planTable">
-            <thead>
-                <tr>
-                    <th class="col-week">Semana / Fechas</th>
-                    <th class="col-book">Foco & Recursos</th>
-                    <th>Resultados de Aprendizaje (Outcomes)</th>
-                    <th style="min-width:300px;">Sesiones & Checklist</th>
-                </tr>
-            </thead>
-            <tbody id="planBody"></tbody>
-        </table>
-    </div>
-
-    <div class="sub" style="margin-top: 40px; text-align: center;">
-        Inspirado en los currículums de top-tier Economics PhDs (MIT, LSE) pero adaptado para auto-estudio.
-        <br>Libros base: Strang (Lineal), Simon & Blume (Math Econ), Ross (Prob), Casella & Berger (Inferencia).
-    </div>
-
 </div>
 
 <script>
-/* CONFIGURACIÓN Y DATOS */
-const STORAGE_KEY = "econ_stats_tracker_v2";
-const DEFAULT_START = "2026-02-09";
-
-// Plantilla de sesiones semanales
-const WEEKLY_SESSIONS = [
-    {key:"mon", title:"Lun: Teoría", meta:"1h15 · Lectura activa"},
-    {key:"tue", title:"Mar: Ejercicios", meta:"1h15 · Mecánica"},
-    {key:"wed", title:"Mié: Derivación", meta:"1h15 · Profundidad"},
-    {key:"thu", title:"Jue: Hard Probs", meta:"1h15 · Sin mirar"},
-    {key:"sat", title:"Sáb: Lab (R/Py)", meta:"2h00 · Simulación"},
-    {key:"sun", title:"Dom: Test/Repaso", meta:"2h00 · Evaluación"}
-];
-
-/* PLAN DE ESTUDIOS (DATA) */
+/* ================= DATA DEL PROGRAMA (Mapeo Oficial) ================= */
 const PLAN = [
-    // --- FASE 1: ÁLGEBRA LINEAL ---
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.1-2", topics: ["Vectores y Espacios", "Combinaciones Lineales", "Producto Punto"], outcomes: ["Entender la geometría vectorial", "Resolver Ax=b via eliminación"] },
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.2", topics: ["Matrices e Inversas", "Factorización LU", "Transpuestas"], outcomes: ["Calcular LU a mano", "Entender cuándo A es singular"] },
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.3", topics: ["Espacios Vectoriales", "Nullspace & Columnspace", "Rango"], outcomes: ["Relacionar Rango con soluciones", "Base y Dimensión"] },
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.3-4", topics: ["Ortogonalidad", "Proyecciones", "Gram-Schmidt"], outcomes: ["Proyección como la 'mejor aprox'", "Bases ortonormales"], milestone: {type:"exam", label:"Mini-Examen #1 (L1-L4)"} },
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.4", topics: ["Mínimos Cuadrados (OLS)", "Matriz de Proyección", "Regresión"], outcomes: ["Derivar beta OLS matricialmente", "Interpretar error e"], milestone: {type:"deliver", label:"NB: OLS desde cero"} },
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.5", topics: ["Determinantes", "Cofactores", "Regla de Cramer"], outcomes: ["Intuición de volumen", "Propiedades clave det(A)"] },
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.6", topics: ["Eigenvalues & Eigenvectors", "Diagonalización"], outcomes: ["Ec. Característica", "Potencias de matrices A^k"], milestone: {type:"exam", label:"Mini-Examen #2 (L5-L7)"} },
-    { phase: "ÁLGEBRA LINEAL", book: "Strang Cap.6+", topics: ["Matrices Simétricas Pos. Def.", "SVD (Intro)"], outcomes: ["Descomposición espectral", "PCA intuición"] },
+    // --- SEMANA 1: FUNDAMENTOS ---
+    { w:1, area:"math", title:"Álgebra Lineal Básica", book:"Simon & Blume: Cap. 6-9", details:["Vectores, independencia lineal", "Determinantes e inversas", "Sistemas Ax=b"], tasks:["Leer Cap 7-8", "Resolver 5 ejercicios de sistemas"] },
+    { w:1, area:"micro", title:"Teoría del Consumidor", book:"Nicholson: Cap. 3-4", details:["Preferencias y Utilidad", "Restricción presupuestaria", "Maximización de utilidad"], tasks:["Derivar demanda Marshaliana", "Entender TMS"] },
+    { w:1, area:"metrics", title:"Repaso Estadística", book:"Wooldridge: Apéndice B y C", details:["Valor Esperado, Varianza, Covarianza", "Distribuciones (Normal, t, F)", "Estimadores básicos"], tasks:["Memorizar prop. Esperanza/Varianza", "Hacer ejercicios Apéndice B"] },
+    { w:1, area:"macro", title:"Contabilidad e Intro", book:"De Gregorio: Cap. 2", details:["Identidades básicas", "Medición del PIB e inflación", "Datos macroeconómicos"], tasks:["Revisar datos Banco Central Chile", "Entender identidades contables"] },
 
-    // --- FASE 2: CÁLCULO ---
-    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Cálculo 1 var", "Elasticidades", "Series Taylor"], outcomes: ["Aproximación local", "Log-linealización"] },
-    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Multivariable", "Gradiente & Hessiano", "Convexidad"], outcomes: ["Matriz Hessiana y curvatura", "Concavidad estricta"] },
-    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Opt. Sin Restricciones", "FOC y SOC"], outcomes: ["Max vs Min local/global", "Puntos silla"], milestone: {type:"exam", label:"Mini-Examen #3 (Cálculo)"} },
-    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Opt. con Restricciones (Igualdad)", "Lagrange"], outcomes: ["Interpretar Multiplicador (Lambda)", "Lagrangiano"] },
-    { phase: "CÁLCULO / OPT", book: "Simon&Blume", topics: ["Restricciones Desigualdad", "Kuhn-Tucker (Intro)"], outcomes: ["Condiciones de holgura", "Teorema de la Envolvente"] },
-    { phase: "BUFFER / REPASO", book: "Repaso General", topics: ["Semana de ajuste", "Rehacer fallos"], outcomes: ["Cerrar brechas Fase 1 y 2"], milestone: {type:"buffer", label:"Semana Buffer"} },
+    // --- SEMANA 2: OPTIMIZACIÓN Y MERCADOS ---
+    { w:2, area:"math", title:"Cálculo Multivariable", book:"Simon & Blume: Cap. 14-15", details:["Derivadas parciales", "Gradiente y Hessiano", "Convexidad y Concavidad"], tasks:["Calcular Hessianos", "Test de concavidad"] },
+    { w:2, area:"micro", title:"Demanda y Producción", book:"Nicholson: Cap. 5-6 y 9", details:["Efecto Ingreso y Sustitución (Slutsky)", "Función de Producción", "Costos"], tasks:["Gráfico Slutsky", "Derivar funciones de costo"] },
+    { w:2, area:"metrics", title:"Modelo Lineal Simple", book:"Wooldridge: Cap. 2", details:["Regresión Simple (OLS)", "Derivación de Beta0 y Beta1", "R-cuadrado"], tasks:["Derivar OLS a mano", "Interpretar coeficientes"] },
+    { w:2, area:"macro", title:"Crecimiento I: Solow", book:"De Gregorio: Cap. 12 (o Romer Cap 1)", details:["Modelo de Solow básico", "Acumulación de capital", "Estado estacionario"], tasks:["Derivar Steady State", "Simular choque en tasa ahorro"] },
 
-    // --- FASE 3: PROBABILIDAD ---
-    { phase: "PROBABILIDAD", book: "Ross Cap.1-2", topics: ["Axiomas", "Combinatoria", "Prob. Condicional"], outcomes: ["Teorema de Bayes", "Independencia"] },
-    { phase: "PROBABILIDAD", book: "Ross Cap.3", topics: ["Vars Aleatorias Discretas", "Bernoulli, Binomial, Poisson"], outcomes: ["PMF y CDF", "Valor Esperado E[X]"] },
-    { phase: "PROBABILIDAD", book: "Ross Cap.4", topics: ["Vars Continuas", "Uniforme, Normal, Exp"], outcomes: ["Densidad PDF vs CDF", "Propiedades de la Normal"] },
-    { phase: "PROBABILIDAD", book: "Ross Cap.5", topics: ["Distribuciones Conjuntas", "Marginales"], outcomes: ["Integral doble", "Independencia v.a."] },
-    { phase: "PROBABILIDAD", book: "Ross Cap.6-7", topics: ["Esperanza, Covarianza", "Correlación", "Momentos"], outcomes: ["Var(X+Y)", "Desigualdad Chebyshev"], milestone: {type:"exam", label:"Mini-Examen #4 (Prob)"} },
-    { phase: "PROBABILIDAD", book: "Ross Cap.8", topics: ["Teoremas Límite", "LLN (Ley Grandes Números)", "CLT"], outcomes: ["Convergencia en prob vs dist", "Simular CLT en Python"], milestone: {type:"deliver", label:"NB: Simulación CLT"} },
+    // --- SEMANA 3: OPTIMIZACIÓN AVANZADA Y EQUILIBRIO ---
+    { w:3, area:"math", title:"Optimización Libres y Restricciones", book:"Simon & Blume: Cap. 17-18", details:["FOC y SOC (Condiciones 1ro/2do orden)", "Lagrange Multipliers", "Interpretación de Lambda"], tasks:["Resolver Lagrangiano", "Interpretar Lambda económicamente"] },
+    { w:3, area:"micro", title:"Equilibrio Parcial Competitivo", book:"Nicholson: Cap. 12", details:["Oferta y Demanda de mercado", "Eficiencia en el CP", "Excedentes"], tasks:["Calcular equilibrio mercado", "Analizar pérdidas eficiencia"] },
+    { w:3, area:"metrics", title:"Regresión Múltiple: Estimación", book:"Wooldridge: Cap. 3", details:["Mecánica de OLS múltiple", "Interpretación 'Ceteris Paribus'", "Sesgo de variable omitida"], tasks:["Entender sesgo por fórmula", "Interpretar dummies"] },
+    { w:3, area:"macro", title:"Consumo e Inversión", book:"De Gregorio: Cap. 4-5", details:["Consumo intertemporal (2 periodos)", "Hipótesis Ingreso Permanente", "Q de Tobin (intro)"], tasks:["Resolver optimización intertemporal", "Euler Equation básica"] },
 
-    // --- FASE 4: INFERENCIA ---
-    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Estimación Puntual", "Sesgo y Varianza", "MSE"], outcomes: ["Bias-Variance Tradeoff", "Consistencia"] },
-    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Máxima Verosimilitud (MLE)", "Propiedades MLE"], outcomes: ["Derivar MLE normal/poisson", "Invarianza"] },
-    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Intervalos de Confianza", "Método Pivote"], outcomes: ["Interpretación frecuentista", "Construcción IC"] },
-    { phase: "INFERENCIA", book: "Casella&Berger", topics: ["Test de Hipótesis", "Lema Neyman-Pearson"], outcomes: ["Error Tipo I y II", "Potencia del test"], milestone: {type:"exam", label:"EXAMEN FINAL"} }
+    // --- SEMANA 4: EQUILIBRIO GENERAL Y GAUSS-MARKOV ---
+    { w:4, area:"math", title:"Kuhn-Tucker (Intro)", book:"Simon & Blume: Cap. 18-19", details:["Restricciones de desigualdad", "Condiciones de holgura complementaria"], tasks:["Plantear problema K-T simple"] },
+    { w:4, area:"micro", title:"Equilibrio General (Intercambio)", book:"Nicholson: Cap. 13", details:["Caja de Edgeworth", "Eficiencia de Pareto", "1er y 2do Teorema del Bienestar"], tasks:["Dibujar Caja Edgeworth", "Definir Pareto Óptimo"] },
+    { w:4, area:"metrics", title:"Inferencia y Gauss-Markov", book:"Wooldridge: Cap. 4", details:["Teorema Gauss-Markov (BLUE)", "Pruebas de Hipótesis (t-test)", "Intervalos de Confianza"], tasks:["Demostrar insesgadez", "Realizar test de hipótesis"] },
+    { w:4, area:"macro", title:"Fluctuaciones: IS-LM", book:"De Gregorio: Cap. 14-15", details:["Mercado bienes y dinero", "Derivación IS-LM", "Políticas fiscal/monetaria CP"], tasks:["Gráficos estática comparativa", "Multiplicadores"] },
+
+    // --- SEMANA 5: FALLAS DE MERCADO I ---
+    { w:5, area:"math", title:"Ecuaciones Diferenciales (Intro)", book:"Simon & Blume: Cap. 24", details:["Ec. Diferenciales primer orden", "Diagramas de fase (básico)", "Estabilidad"], tasks:["Resolver EDO simple", "Dibujar diagrama fase"] },
+    { w:5, area:"micro", title:"Fallas: Externalidades", book:"Nicholson: Cap. 19", details:["Externalidades + y -", "Impuestos Pigou", "Teorema de Coase"], tasks:["Calcular pérdida social", "Solución privada vs social"] },
+    { w:5, area:"metrics", title:"Asintótica y OLS problemas", book:"Wooldridge: Cap. 5-6", details:["Consistencia (n grande)", "Formas funcionales (ln-ln, ln-level)", "Predicción"], tasks:["Interpretar logaritmos", "Diferencia insesgado vs consistente"] },
+    { w:5, area:"macro", title:"Oferta y Demanda Agregada", book:"De Gregorio: Cap. 16-17", details:["Modelo OA-DA dinámico", "Curva de Phillips", "Expectativas"], tasks:["Analizar shock oferta/demanda", "Curva Phillips CP vs LP"] },
+
+    // --- SEMANA 6: FALLAS DE MERCADO II ---
+    { w:6, area:"math", title:"Repaso / Buffer Matemática", book:"Review General", details:["Consolidar Optimización y Álgebra", "Revisar errores anteriores"], tasks:["Rehacer ejercicios difíciles"] },
+    { w:6, area:"micro", title:"Bienes Públicos", book:"Nicholson: Cap. 19", details:["No rivalidad / No exclusión", "Condición de Samuelson", "Free Rider"], tasks:["Derivar Condición Samuelson", "Problema del polizón"] },
+    { w:6, area:"metrics", title:"Variables Dummy y Heterocedast.", book:"Wooldridge: Cap. 7-8", details:["Variables cualitativas", "Detección Heterocedasticidad", "Errores Robustos"], tasks:["Test de White/Breusch-Pagan", "Uso de errores robustos"] },
+    { w:6, area:"macro", title:"Política Monetaria y Fiscal", book:"De Gregorio: Cap. 19-20", details:["Reglas de política (Taylor)", "Restricción presupuestaria gobierno", "Equivalencia Ricardiana"], tasks:["Analizar Regla de Taylor", "Implicancias deuda pública"] },
+
+    // --- SEMANA 7: TEORÍA DE JUEGOS ---
+    { w:7, area:"math", title:"Estocástica Intro", book:"Notas de clase / Ross", details:["Variables aleatorias en economía", "Valor esperado de funciones"], tasks:["Jensen's Inequality"] },
+    { w:7, area:"micro", title:"Teoría de Juegos (Estáticos)", book:"Nicholson: Cap. 8 (o Gibbons)", details:["Juegos en forma normal", "Estrategias Dominantes", "Equilibrio de Nash"], tasks:["Resolver Dilema Prisionero", "Calcular Nash puros/mixtos"] },
+    { w:7, area:"metrics", title:"Series de Tiempo Básicas", book:"Wooldridge: Cap. 10", details:["Datos de serie temporal", "Tendencias y estacionalidad", "Autocorrelación básica"], tasks:["Diferenciar OLS CS vs TS", "Detrending"] },
+    { w:7, area:"macro", title:"Modelos Dinámicos (Ramsey)", book:"De Gregorio/Romer", details:["Intro a Ramsey-Cass-Koopmans", "Optimización dinámica (intuición)"], tasks:["Entender Euler Equation consumo"] },
+
+    // --- SEMANA 8: REPASO FINAL ---
+    { w:8, area:"math", title:"Examen Final Math", book:"Todo el material", details:["Repaso integrador", "Simulacro de prueba"], tasks:["Resolver examen año anterior"] },
+    { w:8, area:"micro", title:"Examen Final Micro", book:"Todo el material", details:["Repaso integrador", "Simulacro de prueba"], tasks:["Resolver examen año anterior"] },
+    { w:8, area:"metrics", title:"Examen Final Econometría", book:"Todo el material", details:["Repaso integrador", "Simulacro de prueba"], tasks:["Resolver examen año anterior"] },
+    { w:8, area:"macro", title:"Examen Final Macro", book:"Todo el material", details:["Repaso integrador", "Simulacro de prueba"], tasks:["Resolver examen año anterior"] }
 ];
 
-/* LÓGICA DE LA APP */
-let state = {};
+/* ================= LÓGICA DE LA APP ================= */
+const STORAGE_KEY = "fen_planner_v1";
 
-function init() {
-    // 1. Cargar estado
-    loadState();
-    
-    // 2. Configurar fecha
-    const dateInput = document.getElementById("startDatePicker");
-    if(!state.config) state.config = { startDate: DEFAULT_START };
-    dateInput.value = state.config.startDate;
-    
-    dateInput.addEventListener("change", (e) => {
-        state.config.startDate = e.target.value;
-        saveState();
-        render();
-    });
-
-    // 3. Botones
-    document.getElementById("btnExport").onclick = exportData;
-    document.getElementById("btnImport").onclick = importData;
-    document.getElementById("btnReset").onclick = resetData;
-
-    // 4. Render inicial
-    render();
+function loadState() {
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? JSON.parse(s) : {};
 }
 
-function getWeekDateRange(startDateStr, weekIndex) {
-    const start = new Date(startDateStr + "T00:00:00"); // Fix timezone issue roughly
-    start.setDate(start.getDate() + (weekIndex * 7));
-    const end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    return { start, end };
+function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    updateProgress();
 }
 
-function formatDate(date) {
-    return date.toLocaleDateString("es-CL", { day: "2-digit", month: "short" });
-}
-
-function isCurrentWeek(start, end) {
-    const now = new Date();
-    // Reset hours to compare dates strictly
-    now.setHours(0,0,0,0);
-    const s = new Date(start); s.setHours(0,0,0,0);
-    const e = new Date(end); e.setHours(23,59,59,999);
-    return now >= s && now <= e;
-}
-
-function render() {
-    const tbody = document.getElementById("planBody");
+function renderTable(filterWeek = "all") {
+    const tbody = document.getElementById("tableContent");
     tbody.innerHTML = "";
     
-    const startDate = state.config.startDate;
-    let totalChecks = 0;
-    let doneChecks = 0;
+    let state = loadState();
 
-    document.getElementById("weeksCountDisplay").textContent = PLAN.length;
+    PLAN.forEach((item, index) => {
+        if(filterWeek !== "all" && item.w != filterWeek) return;
 
-    PLAN.forEach((item, idx) => {
-        const weekNum = idx + 1;
-        const { start, end } = getWeekDateRange(startDate, idx);
-        const isCurrent = isCurrentWeek(start, end);
-        
         const tr = document.createElement("tr");
-        if(isCurrent) tr.classList.add("current-week");
+        
+        // Col 1: Semana
+        const tdW = document.createElement("td");
+        tdW.innerHTML = `<span style="font-family:var(--font-mono); color:#8b949e;">W${item.w}</span>`;
+        tr.appendChild(tdW);
 
-        // COL 1: SEMANA
-        const td1 = document.createElement("td");
-        td1.innerHTML = `
-            <div class="mono" style="font-size:16px; font-weight:bold; color:#fff;">W${weekNum}</div>
-            <div class="sub" style="font-size:11px; margin-bottom:4px;">${formatDate(start)} - ${formatDate(end)}</div>
-            <div class="tag" style="background:rgba(255,255,255,0.05); color:#fff;">${item.phase}</div>
+        // Col 2: Asignatura (Badge)
+        const tdSub = document.createElement("td");
+        let badgeClass = "";
+        let areaName = "";
+        if(item.area === "math") { badgeClass="b-math"; areaName="Matemáticas"; }
+        if(item.area === "micro") { badgeClass="b-micro"; areaName="Micro"; }
+        if(item.area === "macro") { badgeClass="b-macro"; areaName="Macro"; }
+        if(item.area === "metrics") { badgeClass="b-metrics"; areaName="Econometría"; }
+        
+        tdSub.innerHTML = `<span class="badge ${badgeClass}">${areaName}</span>`;
+        tr.appendChild(tdSub);
+
+        // Col 3: Contenido
+        const tdContent = document.createElement("td");
+        tdContent.innerHTML = `
+            <div style="font-weight:600; color:#fff;">${item.title}</div>
+            <span class="book-ref">📖 ${item.book}</span>
+            <ul class="outcome-list">
+                ${item.details.map(d => `<li>${d}</li>`).join('')}
+            </ul>
         `;
-        tr.appendChild(td1);
+        tr.appendChild(tdContent);
 
-        // COL 2: LIBRO
-        const td2 = document.createElement("td");
-        let tagsHtml = item.topics.map(t => `<div class="tag">${t}</div>`).join(" ");
-        if(item.milestone) {
-            let cls = item.milestone.type === "exam" ? "exam" : (item.milestone.type === "buffer" ? "buffer" : "deliver");
-            tagsHtml += `<br><div class="tag ${cls}" style="margin-top:8px;">★ ${item.milestone.label}</div>`;
-        }
-        td2.innerHTML = `
-            <div style="font-weight:600; color:#fff; margin-bottom:4px;">${item.book}</div>
-            ${tagsHtml}
-        `;
-        tr.appendChild(td2);
-
-        // COL 3: OUTCOMES
-        const td3 = document.createElement("td");
-        td3.innerHTML = `<ul>${item.outcomes.map(o => `<li>${o}</li>`).join("")}</ul>`;
-        tr.appendChild(td3);
-
-        // COL 4: CHECKLIST
-        const td4 = document.createElement("td");
-        const grid = document.createElement("div");
-        grid.className = "check-grid";
-
-        // Generar checks normales
-        WEEKLY_SESSIONS.forEach(sess => {
-            const cid = `w${weekNum}_${sess.key}`;
-            const isChecked = state[cid] === 1;
-            totalChecks++;
-            if(isChecked) doneChecks++;
-
-            const div = document.createElement("label");
-            div.className = "chk-item";
-            div.innerHTML = `
-                <input type="checkbox" data-id="${cid}" ${isChecked ? "checked" : ""}>
-                <div>
-                    <span class="chk-title">${sess.title}</span>
-                    <span class="chk-meta">${sess.meta}</span>
-                </div>
+        // Col 4: Checks
+        const tdCheck = document.createElement("td");
+        item.tasks.forEach((task, tIndex) => {
+            const taskId = `w${item.w}_${item.area}_t${tIndex}`;
+            const checked = state[taskId] ? "checked" : "";
+            
+            const label = document.createElement("label");
+            label.className = "check-container";
+            label.innerHTML = `
+                ${task}
+                <input type="checkbox" id="${taskId}" ${checked} onchange="toggleCheck('${taskId}')">
+                <span class="checkmark"></span>
             `;
-            // Evento cambio
-            div.querySelector("input").addEventListener("change", (e) => {
-                state[cid] = e.target.checked ? 1 : 0;
-                saveState();
-                render(); // Re-render para actualizar KPI
-            });
-            grid.appendChild(div);
+            tdCheck.appendChild(label);
         });
+        tr.appendChild(tdCheck);
 
-        // Generar check de milestone si existe
-        if(item.milestone) {
-            const mid = `w${weekNum}_milestone`;
-            const isChecked = state[mid] === 1;
-            totalChecks++;
-            if(isChecked) doneChecks++;
-
-            const div = document.createElement("label");
-            div.className = "chk-item";
-            div.style.gridColumn = "span 2";
-            div.style.borderColor = item.milestone.type === "buffer" ? "var(--bad)" : "var(--warn)";
-            div.innerHTML = `
-                <input type="checkbox" data-id="${mid}" ${isChecked ? "checked" : ""}>
-                <div>
-                    <span class="chk-title" style="color:${item.milestone.type === "buffer" ? "var(--bad)" : "var(--warn)"}">${item.milestone.label}</span>
-                    <span class="chk-meta">Hito Obligatorio</span>
-                </div>
-            `;
-            div.querySelector("input").addEventListener("change", (e) => {
-                state[mid] = e.target.checked ? 1 : 0;
-                saveState();
-                render();
-            });
-            grid.appendChild(div);
-        }
-
-        td4.appendChild(grid);
-        tr.appendChild(td4);
         tbody.appendChild(tr);
     });
+    updateProgress();
+}
 
-    // Actualizar KPIs Globales
-    const pct = totalChecks === 0 ? 0 : Math.round((doneChecks / totalChecks) * 100);
-    document.getElementById("doneCount").textContent = doneChecks;
-    document.getElementById("totalCount").textContent = totalChecks;
-    document.getElementById("globalPercent").textContent = pct + "%";
+function toggleCheck(id) {
+    let state = loadState();
+    const chk = document.getElementById(id);
+    if (chk.checked) {
+        state[id] = true;
+    } else {
+        delete state[id];
+    }
+    saveState(state);
+}
+
+function updateProgress() {
+    let state = loadState();
+    // Contar total de tareas en el PLAN
+    let totalTasks = 0;
+    PLAN.forEach(p => totalTasks += p.tasks.length);
+    
+    // Contar checked
+    let done = Object.keys(state).length;
+    
+    let pct = totalTasks === 0 ? 0 : Math.round((done / totalTasks) * 100);
+    
     document.getElementById("globalFill").style.width = pct + "%";
+    document.getElementById("globalPct").innerText = pct + "%";
 }
 
-/* PERSISTENCIA */
-function loadState() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        state = raw ? JSON.parse(raw) : {};
-    } catch (e) { console.error("Error loading state", e); state = {}; }
-}
-
-function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function exportData() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-    const dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "progreso_estudio.json");
-    dlAnchorElem.click();
-}
-
-function importData() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-        reader.onload = readerEvent => {
-            try {
-                state = JSON.parse(readerEvent.target.result);
-                saveState();
-                init(); // Reiniciar con nueva data
-                alert("Progreso cargado exitosamente.");
-            } catch(err) { alert("Error al leer archivo JSON"); }
-        }
-    }
-    input.click();
-}
-
-function resetData() {
-    if(confirm("¿Seguro que quieres borrar todo el progreso?")) {
-        state = { config: { startDate: DEFAULT_START } };
-        saveState();
-        render();
+function resetProgress() {
+    if(confirm("¿Borrar todo el progreso?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderTable(document.getElementById("weekFilter").value);
     }
 }
 
-// Iniciar app
-init();
+// Filtro
+document.getElementById("weekFilter").addEventListener("change", (e) => {
+    renderTable(e.target.value);
+});
+
+// Init
+renderTable();
 
 </script>
 </body>
